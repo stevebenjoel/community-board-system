@@ -1,0 +1,7 @@
+{
+  "locale": "en",
+  "name": "English",
+  "status": "source",
+  "navigation": {"home":"Overview","cases":"Cases & reports","projects":"Projects & funding","community":"My community","profile":"My profile & security"},
+  "report": {"title":"Report a community issue","private":"Reports are confidential by default.","submitted":"Your report has been received."}
+}

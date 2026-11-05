@@ -1,0 +1,31 @@
+services:
+  cbs:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: production
+      CBS_MODE: appwrite
+      HOST: 0.0.0.0
+      PORT: 8080
+      APP_ORIGIN: ${APP_ORIGIN:?Set actual application origin}
+      APPWRITE_ENDPOINT: ${APPWRITE_ENDPOINT:?Set Appwrite endpoint}
+      APPWRITE_PROJECT_ID: ${APPWRITE_PROJECT_ID:?Set Appwrite project}
+      APPWRITE_API_KEY: ${APPWRITE_API_KEY:?Set private server API key}
+      APPWRITE_DATABASE_ID: ${APPWRITE_DATABASE_ID:-cbs}
+      APPWRITE_DATA_KEY: ${APPWRITE_DATA_KEY:?Set base64 32-byte data encryption key}
+      APPWRITE_EVIDENCE_BUCKET_ID: ${APPWRITE_EVIDENCE_BUCKET_ID:-cbs_evidence}
+      CBS_CLAMAV_HOST: ${CBS_CLAMAV_HOST:-clamav}
+      CBS_CLAMAV_PORT: 3310
+      CBS_REMINDER_INTERVAL_MS: ${CBS_REMINDER_INTERVAL_MS:-900000}
+    depends_on:
+      - clamav
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - clamav-signatures:/var/lib/clamav
+    # Internal only. Do not publish the clamd port to the internet.
+volumes:
+  clamav-signatures:

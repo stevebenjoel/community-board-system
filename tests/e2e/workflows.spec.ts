@@ -1,0 +1,11 @@
+import { test,expect } from '@playwright/test';
+test('citizen submits a confidential report and can find it after reload',async({page})=>{
+  await page.goto('/');await page.getByLabel('Choose synthetic test profile').selectOption({label:'Ada Okafor · Resident'});await expect(page.getByRole('heading',{name:'Welcome back, Ada.'})).toBeVisible();
+  await page.getByRole('button',{name:'Report an issue',exact:true}).first().click();const dialog=page.getByRole('dialog');const title=`Synthetic water report ${Date.now()}`;
+  await dialog.getByLabel('Issue title').fill(title);await dialog.getByLabel('Describe what happened').fill('SYNTHETIC test: the public water point requires a documented repair assessment.');await dialog.getByRole('button',{name:'Save record'}).click();await expect(dialog).not.toBeVisible();
+  await page.goto('/cases');await page.getByRole('button',{name:title,exact:true}).click();await expect(page.getByRole('heading',{name:title})).toBeVisible();await expect(page.getByText('Confidential',{exact:true})).toBeVisible();await page.reload();await expect(page.getByRole('heading',{name:title})).toBeVisible();
+});
+test('technical administrator sees no citizen case details; public projects remain readable',async({page})=>{
+  await page.goto('/');await page.getByLabel('Choose synthetic test profile').selectOption({label:'Technical administrator · Platform Admin'});await expect(page.getByRole('heading',{name:'Welcome back, Technical.'})).toBeVisible();await page.goto('/cases');await expect(page.getByRole('button',{name:'Community water point needs repair'})).toHaveCount(0);await page.goto('/projects');await expect(page.getByRole('button',{name:'Greenfield community water scheme',exact:true})).toBeVisible();
+});
+test('keyboard-accessible reporting dialog can be dismissed without submission',async({page})=>{await page.goto('/');await page.getByLabel('Choose synthetic test profile').selectOption({label:'Ada Okafor · Resident'});await page.getByRole('button',{name:'Report an issue',exact:true}).first().click();await expect(page.getByRole('dialog')).toBeVisible();await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();});

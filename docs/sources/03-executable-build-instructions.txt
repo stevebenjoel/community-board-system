@@ -1,0 +1,1847 @@
+COMMUNITY BOARD SYSTEM (CBS)
+Codex-Ready Executable Build Instructions
+Project: Community Board System (CBS)
+Framework: YADEI Community Board System / CivicOS
+Initial deployment: Nigeria
+Development method: OpenAI Codex
+Architecture: Next.js + NestJS + PostgreSQL + React Native
+Build objective: A functional, secure, scalable grassroots governance platform.
+
+I recommend using a master Codex build instruction followed by eight execution phases. This will enable Codex to create the actual application, database, API, user interfaces, access controls and tests rather than simply generating a prototype or design document.
+
+The instructions below are designed for a fresh repository. Codex should work directly in the project files, execute commands, run tests, resolve errors and document its results.
+1. Master instruction — paste into Codex first
+The following is the main implementation directive. It defines the application and establishes the rules Codex must follow throughout development.
+
+PROJECT: COMMUNITY BOARD SYSTEM (CBS)
+IMPLEMENTATION: FULL-STACK PRODUCTION-ORIENTED APPLICATION
+INITIAL COUNTRY: NIGERIA
+BUILD MODE: EXECUTE, TEST, VERIFY AND DOCUMENT
+
+You are the principal software architect and engineering agent responsible for implementing the Community Board System (CBS).
+
+MISSION
+Build a secure, functional, accessible digital community governance platform connecting citizens, community boards, government agencies and approved institutional partners.
+
+Do not deliver only wireframes, pseudocode, architecture descriptions or static demonstration pages. Create the actual application source code, database schema, backend services, API endpoints, working interfaces, automated tests and deployment configurations.
+
+Execute the implementation inside the existing workspace. Inspect the repository first. Preserve useful existing code and user work. If the repository is empty, initialize the project.
+
+Do not ask routine implementation questions. Use the specifications below as the source of truth. Record reasonable assumptions in docs/ASSUMPTIONS.md. Ask for human input only when an irreversible or legally significant decision cannot safely be made.
+
+PROJECT FOUNDATIONS
+
+The original community governance model comes from the YADEI Community Board System / CivicOS proposal. The platform should enable structured citizen participation, grassroots accountability, community service monitoring and lawful institutional cooperation.
+
+The platform must not falsely claim statutory government authority. Community boards are participatory, advisory and monitoring bodies unless applicable law or signed institutional agreements grant additional powers.
+
+NATIONAL ORGANIZATION
+
+Support the following hierarchy:
+
+1. National Secretariat
+2. Six geopolitical coordinating zones
+3. State/FCT coordination
+4. 774 Local Government Areas / Area Councils
+5. Wards
+6. Communities and settlements
+7. Optional polling-unit geographic references and community meeting points
+
+State/FCT coordination is an operational software layer. It must not silently replace the governance hierarchy adopted by the organization.
+
+Use verified, versioned geography datasets. Do not fabricate ward, polling-unit, settlement or government identifiers.
+
+SEVEN MANDATORY THEMATIC BOARDS
+
+EDU — Board of Education
+HLT — Board of Health
+SEC — Board of Security and Intelligence Gathering
+INF — Board of Infrastructure
+TRD — Board of Trade, Investment and Tourism
+YTH — Board of Skills and Youth Development
+CUL — Board of Culture and Moral Values
+
+All seven board definitions must be included in the initial database seed.
+
+Allow each authorized jurisdiction to establish instances of these boards through a controlled approval workflow.
+
+Do not automatically activate all boards nationwide.
+
+PRIORITY RELEASE MODULES
+
+MODULE 1: Identity, Geography and Jurisdiction
+MODULE 2: Board Membership and Administration
+MODULE 3: Citizen Reporting and Case Management
+MODULE 4: Project and Funding Oversight
+MODULE 5: Meetings and Resolutions
+
+SHARED PLATFORM FEATURES
+
+- Secure authentication and authorization
+- Jurisdiction-aware role management
+- Accessible citizen interfaces
+- Board officer dashboard
+- Institutional partner dashboard
+- Platform administration interface
+- Document and evidence management
+- Notification system
+- Full audit history
+- Public transparency pages
+- Search and filtering
+- Privacy and data protection workflows
+- Responsive mobile-first design
+- Configurable organizational policies
+
+TECHNOLOGY STACK
+
+Use a TypeScript monorepo with:
+
+- pnpm workspaces
+- Turborepo
+- Next.js App Router
+- React
+- Tailwind CSS
+- Accessible UI components
+- NestJS for backend APIs
+- PostgreSQL
+- Prisma ORM
+- PostGIS for spatial capability
+- Redis and BullMQ for background jobs
+- S3-compatible private object storage
+- OpenID Connect-compatible authentication
+- React Native / Expo for the mobile application
+- Zod for shared validation where suitable
+- OpenAPI for documented backend contracts
+- Vitest or Jest for unit tests
+- Supertest for API tests
+- Playwright for web end-to-end tests
+- Docker Compose for local infrastructure
+- GitHub Actions-compatible CI configuration
+
+Use current compatible stable dependencies. Do not pin obsolete versions or invent unsupported integrations.
+
+ARCHITECTURAL STYLE
+
+Start with a modular monolith backend and separate web/mobile clients.
+
+Do not create multiple independent microservices unless absolutely necessary.
+
+Maintain clean module boundaries, explicit service interfaces, typed contracts and database migrations.
+
+Use PostgreSQL as the transactional system of record.
+
+Do not use browser local storage as the authoritative source for any government, board, case, appointment, project or meeting records.
+
+APPLICATIONS TO CREATE
+
+apps/citizen-web
+apps/board-portal
+apps/mobile
+apps/api
+apps/worker
+
+SHARED PACKAGES
+
+packages/ui
+packages/shared-types
+packages/validation
+packages/api-client
+packages/authorization
+packages/config
+
+DOCUMENTATION
+
+docs/ARCHITECTURE.md
+docs/ASSUMPTIONS.md
+docs/DATABASE.md
+docs/API.md
+docs/ROLES_AND_PERMISSIONS.md
+docs/SECURITY.md
+docs/PRIVACY.md
+docs/GOVERNANCE_RULES.md
+docs/DEPLOYMENT.md
+docs/OPERATIONS.md
+docs/TESTING.md
+docs/IMPLEMENTATION_STATUS.md
+
+IMPLEMENTATION RULES
+
+1. Write actual source files, not illustrative snippets.
+2. Run installations, code generation, migrations and tests.
+3. Use strict TypeScript typing.
+4. Validate all external inputs.
+5. Enforce authentication and permissions on the backend.
+6. Use database transactions for authoritative state changes.
+7. Make critical state transitions explicit.
+8. Store sensitive files privately.
+9. Prevent cross-jurisdiction information leakage.
+10. Maintain tamper-evident audit histories.
+11. Provide working loading, empty, error and success states.
+12. Support keyboard and screen-reader accessibility.
+13. Never present fictional project funding as verified public data.
+14. Never assign government authority to a board through software configuration alone.
+15. Never expose confidential security reports through public interfaces.
+16. Never claim emergency dispatch is active without an authorized operational integration.
+17. Never invent official government identities or registration information.
+18. Do not commit secrets, credentials or real personal data.
+19. Use synthetic data for development and tests.
+20. Provide commands to reproduce the environment.
+
+SECURITY
+
+Implement least privilege, MFA for privileged accounts, secure session management, rate limiting, server-side access enforcement, audit logging, privacy-by-default, encryption in transit, protected document access and safe evidence handling.
+
+Treat protected complaints, identity-verification records and security reports as confidential.
+
+Do not build citizen surveillance, unauthorized tracking, coercive identity screening, automatic criminal profiling, or unauthorized law-enforcement functionality.
+
+GOVERNANCE
+
+Board rules such as tenure, quorum, voting thresholds, appointment authority and removal procedures must be stored as versioned configurable policies.
+
+Use explicit approval states. Do not invent legally binding governance powers.
+
+Citizen reports, official government responses, board recommendations and independently verified outcomes must be distinguishable.
+
+DELIVERY RULE
+
+Implement in phases. At the end of every phase:
+
+- Run relevant automated checks.
+- Fix failures caused by your implementation.
+- Report created or modified files.
+- Report executed commands and test results.
+- Record any unimplemented features.
+- Update docs/IMPLEMENTATION_STATUS.md.
+- Continue to the next phase when possible.
+
+If an external dependency, credential, dataset or approval is unavailable, create a clearly identified integration boundary or safe mock for local tests. Do not pretend that the real integration works.
+
+FINAL DEFINITION OF DONE
+
+The implementation is complete only when:
+
+- All five priority modules have working interfaces and backend workflows.
+- Database migrations and seed scripts execute successfully.
+- A developer can register and authenticate a synthetic test user.
+- A user can select and verify an eligible community through a test workflow.
+- Authorized officers can establish and manage a board.
+- Citizens can submit and track cases.
+- Authorized officers can review and resolve cases.
+- Public projects and funding records can be monitored.
+- Board meetings can be scheduled.
+- Quorum and votes are validated.
+- Minutes and resolutions can be approved.
+- Authorization tests reject prohibited actions.
+- Public pages do not disclose confidential information.
+- The mobile app can connect to the backend in a local development environment.
+- The project builds and all required tests pass.
+- Local startup and deployment instructions are documented.
+
+START NOW.
+
+First inspect the repository and development tools. Then create the project plan and establish the working monorepo. Execute the phases described in the subsequent build instructions.
+
+
+
+2. Execution sequence
+After installing the master instruction into the Codex conversation, submit the following phases in order. Each one tells Codex which files, features, database tables and tests to implement.
+01
+
+Repository and infrastructure
+
+02
+
+Identity, geography and access
+
+03
+
+Seven boards and membership
+
+04
+
+Citizen complaints and cases
+
+05
+
+Projects and funding
+
+06
+
+Meetings and resolutions
+
+07
+
+Dashboards and mobile application
+
+08
+
+Testing, hardening and deployment
+
+
+
+3. Phase 1 — Repository, infrastructure and database foundation
+
+EXECUTE PHASE 1 — REPOSITORY AND CORE INFRASTRUCTURE
+
+Using the CBS master instruction, create the actual monorepo and working local development environment.
+
+TASKS
+
+1. Inspect the current workspace and determine which files already exist.
+2. Initialize pnpm workspace and Turborepo if needed.
+3. Create:
+   - apps/citizen-web
+   - apps/board-portal
+   - apps/mobile
+   - apps/api
+   - apps/worker
+   - packages/ui
+   - packages/shared-types
+   - packages/validation
+   - packages/api-client
+   - packages/authorization
+   - packages/config
+4. Configure TypeScript strict mode.
+5. Configure ESLint, Prettier and consistent workspace scripts.
+6. Create Docker Compose configuration for:
+   - PostgreSQL
+   - Redis
+   - S3-compatible object storage for development
+   - Local email testing where useful
+7. Configure Prisma in the API project.
+8. Establish PostgreSQL migrations.
+9. Enable PostGIS if supported by the selected PostgreSQL image.
+10. Set up the initial authentication provider integration.
+11. Create a basic API health endpoint.
+12. Implement structured error handling and request tracing.
+13. Create a shared environment configuration schema.
+14. Add .env.example containing placeholders only.
+15. Add a database seed runner.
+16. Add GitHub Actions-compatible CI checks.
+17. Add a root README with reproducible installation instructions.
+
+REQUIRED ROOT COMMANDS
+
+Implement these package scripts:
+
+pnpm install
+pnpm dev
+pnpm build
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm test:e2e
+pnpm db:migrate
+pnpm db:seed
+
+If appropriate, also implement:
+
+pnpm infra:up
+pnpm infra:down
+pnpm db:reset
+pnpm format
+
+Do not assume these commands exist until you have created and verified them.
+
+INITIAL DATA MODEL
+
+Create the foundational tables:
+
+users
+auth_identities
+user_contacts
+organizations
+geo_units
+geo_sources
+communities
+residencies
+residency_evidence
+role_grants
+board_types
+boards
+board_charters
+audit_events
+files
+document_versions
+outbox_events
+notifications
+
+Use UUID primary keys, appropriate foreign keys, timestamps and database constraints.
+
+GEOGRAPHIC REFERENCE RULE
+
+Seed Nigeria's six geopolitical zones and 36 states plus FCT from an explicitly maintained reference file.
+
+Do not generate fake LGA, ward, community or polling-unit records.
+
+Provide an import pipeline for verified LGA/ward data, including source metadata and versioning.
+
+Where an authoritative dataset is unavailable locally, leave the registry incomplete and display a clear configuration notice. Supply only a small, clearly synthetic test fixture for automated tests.
+
+BOARD TYPE SEED
+
+Insert exactly the seven required principal board types with these codes:
+
+EDU
+HLT
+SEC
+INF
+TRD
+YTH
+CUL
+
+Make the seed idempotent.
+
+SECURITY FOUNDATION
+
+Implement:
+
+- Secure environment variables
+- Backend authentication guards
+- Initial permission-checking abstraction
+- Jurisdiction-aware authorization policy interface
+- Safe request validation
+- Structured application errors
+- Audit-event creation service
+- Secure file metadata model
+
+Do not implement unrestricted super-admin access to private records.
+
+USER INTERFACE FOUNDATION
+
+Create:
+
+- Responsive app shells
+- Shared navigation components
+- Login and registration entry points
+- Dashboard placeholders connected to real API health/session state
+- Loading states
+- Error states
+- Empty states
+- Accessible form components
+
+Temporary skeleton screens are permitted during this phase, but all placeholders must be documented and replaced in later phases.
+
+VERIFY
+
+Run dependency installation.
+Start infrastructure.
+Run database migrations.
+Run seed scripts.
+Start web and API applications.
+Call the health endpoint.
+Run lint and typecheck.
+
+Fix all failures within scope.
+
+OUTPUT
+
+Create docs/PHASE_01_REPORT.md containing:
+- File tree
+- Installed package versions
+- Environment setup
+- Commands executed
+- Test results
+- Outstanding blockers
+- Next phase readiness
+
+
+
+4. Phase 2 — Identity, geography and jurisdiction
+
+EXECUTE PHASE 2 — IDENTITY AND GEOGRAPHY
+
+Implement all identity, residency, geographic jurisdiction and user access workflows. Replace Phase 1 placeholders with functional screens and APIs.
+
+SCREENS
+
+ID-01 Welcome and Language Selection
+ID-02 Login
+ID-03 Registration
+ID-04 Contact Verification
+ID-05 Geography Selection
+ID-06 Residency Verification
+ID-07 Profile Completion
+ID-08 Citizen Home Dashboard
+ID-09 My Community
+ID-10 Account Security
+ID-11 Privacy and Data Rights
+ID-12 Jurisdiction Change
+
+REQUIREMENTS
+
+Users must be able to:
+
+1. Register with email or telephone authentication.
+2. Verify ownership of the selected contact method.
+3. Sign in and sign out securely.
+4. Recover accounts through secure provider-supported flows.
+5. View and edit permitted profile details.
+6. Select their state/FCT, LGA, ward and community.
+7. Submit residency evidence through a controlled workflow.
+8. View verification status.
+9. Request a jurisdiction change.
+10. View the boards and public projects associated with their selected community.
+11. Request applicable privacy rights through the platform.
+
+Implement a searchable cascading geographic selector.
+
+Each geographic unit must contain:
+- UUID
+- Type
+- Parent ID
+- Official code where available
+- Name
+- Alternative names
+- Source reference
+- Source version
+- Effective dates
+- Active status
+- Optional verified geometry
+
+Polling units must be optional geographic references, not mandatory community parents.
+
+IDENTITY PRIVACY
+
+Avoid making National Identification Number submission mandatory.
+
+Do not store national identity numbers or biometric information without a separate approved integration design, lawful basis and security review.
+
+Store contact information securely.
+
+Do not expose residency documents to public users or unauthorized board officers.
+
+ROLES
+
+Implement at minimum:
+
+PUBLIC_VISITOR
+RESIDENT
+COMMUNITY_FACILITATOR
+BOARD_MEMBER
+BOARD_SECRETARY
+BOARD_CHAIR
+LGA_COORDINATOR
+STATE_COORDINATOR
+ZONAL_COORDINATOR
+NATIONAL_COORDINATOR
+AGENCY_OFFICER
+ETHICS_REVIEWER
+PLATFORM_ADMIN
+SECURITY_ADMIN
+AUDITOR
+
+A user may have multiple roles, each scoped to a specific jurisdiction or board, with effective dates.
+
+Role assignment must require a verified authorization process.
+
+Do not allow users to promote themselves to officer or administrator roles.
+
+AUTHORIZATION
+
+Every privileged request must validate:
+- Authenticated principal
+- Active role grant
+- Required permission
+- Jurisdiction scope
+- Appointment validity where applicable
+- Record sensitivity
+- Any active restrictions
+
+Use shared authorization policies throughout the backend.
+
+API
+
+Implement the identity, user profile, geography and residency endpoints defined in the CBS specification.
+
+Add OpenAPI documentation.
+
+TESTS
+
+Test:
+- Registration
+- Duplicate contact handling
+- Invalid OTP/challenge
+- Rate limiting
+- Residency approval and rejection
+- Account recovery
+- Cross-jurisdiction access denial
+- Unauthorized role assignment
+- Expired role access denial
+- Geographic history preservation
+- Public access to non-sensitive community information
+
+Test with synthetic data only.
+
+PHASE COMPLETION
+
+A synthetic resident must be able to register, log in, select a real imported jurisdiction or clearly synthetic test jurisdiction, complete a simulated residency approval, and view the correct community dashboard.
+
+All screens must connect to working backend endpoints.
+
+Run migrations, tests, lint, typecheck and build.
+
+Update implementation documentation.
+
+
+
+5. Phase 3 — Seven boards, appointments and governance
+
+EXECUTE PHASE 3 — BOARD MANAGEMENT
+
+Build the complete board governance system using the seven permanent thematic board definitions.
+
+PRINCIPAL BOARDS
+
+EDU — Education
+HLT — Health
+SEC — Security and Intelligence Gathering
+INF — Infrastructure
+TRD — Trade, Investment and Tourism
+YTH — Skills and Youth Development
+CUL — Culture and Moral Values
+
+BOARD SCREENS
+
+BD-01 Board Directory
+BD-02 Board Profile
+BD-03 Board Creation
+BD-04 Nomination / Application
+BD-05 Candidate Screening
+BD-06 Appointment Approval
+BD-07 Membership Register
+BD-08 Member Detail
+BD-09 Roles and Delegation
+BD-10 Conflict of Interest
+BD-11 Committees and Tasks
+BD-12 Tenure and Removal
+
+DATABASE
+
+Implement:
+
+board_types
+boards
+board_charters
+nominations
+screening_reviews
+appointments
+conflict_disclosures
+recusals
+board_committees
+board_tasks
+appointment_decisions
+appointment_documents
+
+Create migrations and indexes.
+
+BOARD CREATION
+
+Board instances must link to:
+- Principal board type
+- Geographic jurisdiction
+- Approved governance charter
+- Establishment authority
+- Membership policy
+- Status
+- Effective dates
+
+Workflow:
+
+DRAFT
+SUBMITTED
+UNDER_REVIEW
+APPROVED
+ACTIVE
+SUSPENDED
+ARCHIVED
+
+Prevent duplicate active board instances of the same type and jurisdiction unless an explicitly approved governance rule permits them.
+
+NOMINATIONS
+
+Capture:
+- Nominee
+- Nominator
+- Board
+- Proposed role
+- Professional/stakeholder category
+- Candidate acceptance
+- Residency verification
+- Qualification evidence
+- Conflict disclosures
+- Screening result
+- Approval decision
+
+Implement separation of duties.
+
+A candidate cannot approve their own appointment.
+
+The person conducting screening must not exercise the final appointment approval for the same nomination unless an explicitly approved and independently reviewed exception is configured.
+
+APPOINTMENTS
+
+Every appointment needs:
+- Appointment ID
+- Board ID
+- Member ID
+- Position
+- Appointing authority
+- Start date
+- End date
+- Appointment document
+- Approval record
+- Status
+- Revocation history
+
+Role permissions become active only after approval.
+
+Implement appointment expiry handling through background jobs.
+
+Revoke privileges when an appointment expires, is revoked or is suspended.
+
+CONFLICTS
+
+Implement a conflict-of-interest registry.
+
+A board member must be able to disclose a conflict concerning a project, case, meeting or contract.
+
+An ethics reviewer must be able to issue a restriction decision.
+
+Restrictions must prevent participation in affected decisions when required.
+
+BOARD TASK MANAGEMENT
+
+Allow authorized users to:
+- Create tasks
+- Assign responsible members
+- Set due dates
+- Attach evidence
+- Track status
+- Record completion review
+
+GOVERNANCE CONFIGURATION
+
+Store configurable:
+- Board tenure
+- Membership size
+- Quorum rules
+- Voting thresholds
+- Meeting notice requirements
+- Approval authority
+- Delegation limits
+- Removal procedures
+
+These are placeholders for approved charter provisions, not automatically valid legal rules.
+
+Where an approved rule is absent, disable the dependent legally significant action and display "Governance configuration required."
+
+PUBLIC BOARD DIRECTORY
+
+Display only approved public information.
+
+Do not expose private residential addresses, identity documents, internal disciplinary files or private contact information.
+
+TESTS
+
+- Seven boards are seeded
+- Authorized board creation
+- Duplicate board rejection
+- Nomination
+- Screening
+- Appointment approval
+- Self-approval denial
+- Appointment expiration
+- Revocation
+- Conflict declaration
+- Restricted participation
+- Public/private board data separation
+
+PHASE COMPLETION
+
+An authorized administrator can create a local board, nominate a synthetic member, complete screening, record approval and activate membership.
+
+The app must enforce permissions and conflicts.
+
+Run all checks and document the results.
+
+
+
+6. Phase 4 — Citizen reporting and case management
+
+EXECUTE PHASE 4 — CITIZEN CASE MANAGEMENT
+
+Build the complete complaints and community reporting service.
+
+SCREENS
+
+CS-01 Issue Category Selection
+CS-02 Report Issue
+CS-03 Submission Confirmation
+CS-04 My Cases
+CS-05 Case Detail
+CS-06 Case Inbox
+CS-07 Triage and Assignment
+CS-08 Investigation Workspace
+CS-09 Interagency Referral
+CS-10 Resolution Review
+CS-11 Appeal and Reopen
+CS-12 Case Reporting
+
+CASE TAXONOMY
+
+Create categories mapped to the seven boards.
+
+EDUCATION
+HEALTH
+SECURITY
+INFRASTRUCTURE
+TRADE_AND_INVESTMENT
+YOUTH_AND_SKILLS
+CULTURE_AND_CIVIC_VALUES
+GENERAL_SERVICE
+BOARD_CONDUCT_COMPLAINT
+
+Allow subcategories.
+
+The security category must use restricted intake rules.
+
+CASE CREATION
+
+Required:
+- Category
+- Title
+- Description
+- Jurisdiction
+- Privacy classification
+
+Optional:
+- Date
+- Approximate location
+- Attachments
+- Contact preference
+- Urgency indication
+- Accessibility assistance request
+
+Assign a generated public reference number.
+
+Use an idempotency key to prevent duplicate submissions caused by network retries.
+
+Do not trust reporter identity, role or assignment data submitted from the client.
+
+CASE WORKFLOW
+
+DRAFT
+SUBMITTED
+INTAKE_REVIEW
+NEEDS_INFORMATION
+ACCEPTED
+ASSIGNED
+IN_PROGRESS
+REFERRED
+OUTCOME_PROPOSED
+VERIFICATION
+CLOSED
+APPEALED
+REOPENED
+REJECTED_WITH_REASONS
+DUPLICATE_LINKED
+
+Implement an explicit state machine.
+
+Unauthorized transitions must fail.
+
+TRIAGE
+
+Authorized officers can:
+- Review case
+- Classify
+- Assess urgency
+- Request more information
+- Assign board
+- Assign officer
+- Refer to authorized external agency
+- Record rejection reasons
+- Link duplicate cases
+
+Do not allow automated AI decisions to reject complaints or assign criminal responsibility.
+
+INVESTIGATION
+
+Provide:
+- Evidence uploads
+- Investigation notes
+- Site visit records
+- Officer actions
+- Referral records
+- Status history
+- Citizen-visible updates
+- Restricted internal notes
+
+RECORD INTEGRITY
+
+Maintain an append-only case event history.
+
+Allow corrections through new events, not silent history deletion.
+
+SUPPORTING DOCUMENTS
+
+Use private object storage.
+
+Validate file type and size.
+
+Scan uploads for malware.
+
+Use short-lived signed access URLs.
+
+Never expose raw storage credentials.
+
+CASE CLOSURE
+
+Separate:
+- Outcome proposed
+- Evidence reviewed
+- Outcome verified
+- Citizen feedback
+- Final closure decision
+
+A board acknowledgement is not proof of government action.
+
+Allow residents to appeal or request reopening.
+
+BOARD CONDUCT COMPLAINTS
+
+Create a separate review route to the independent ethics or authorized conduct-review function.
+
+A board accused in a complaint must not control the review of that same complaint.
+
+SECURITY REPORTS
+
+Use strict confidential permissions.
+
+Do not publish precise location, reporter identity, witnesses or allegations.
+
+Include emergency-service guidance.
+
+Do not claim direct emergency dispatch without a real approved integration.
+
+PUBLIC REPORTING
+
+Provide aggregate counts and privacy-safe trends.
+
+Apply redaction and suppress personally identifying details.
+
+TESTS
+
+- Resident submission
+- Idempotent retry
+- Category routing
+- Unauthorized access denial
+- Cross-board restriction
+- Duplicate linkage
+- Referral recording
+- Evidence authorization
+- Status transitions
+- Outcome verification
+- Appeal
+- Confidentiality
+- Complaint against board member
+
+PHASE COMPLETION
+
+Demonstrate a complete synthetic case:
+
+Citizen submits report.
+Triage officer validates it.
+Case is assigned.
+Investigation records are added.
+An authorized outcome is proposed.
+Outcome is reviewed.
+Citizen receives notification.
+Citizen can accept, dispute or appeal.
+
+All history must remain accessible to authorized users.
+
+Run and fix tests.
+
+
+
+7. Phase 5 — Public projects, funding and accountability
+
+EXECUTE PHASE 5 — PROJECT AND FUNDING OVERSIGHT
+
+Build a functional public project transparency and community monitoring system.
+
+SCREENS
+
+PR-01 Public Project Directory
+PR-02 Project Detail
+PR-03 Register Project
+PR-04 Funding Sources
+PR-05 Funding Disclosure
+PR-06 Project Milestones
+PR-07 Monitoring and Inspection
+PR-08 Community Feedback
+PR-09 Variance and Risk Review
+PR-10 Completion Verification
+PR-11 Portfolio Dashboard
+PR-12 Audit and Disclosure History
+
+DATABASE
+
+Implement:
+
+projects
+project_versions
+project_participants
+project_funding
+financial_events
+funding_sources
+project_milestones
+project_inspections
+project_observations
+project_disclosures
+project_documents
+project_change_requests
+project_risk_flags
+project_completion_reviews
+
+PROJECT REGISTRATION
+
+Capture:
+- Project title
+- Description
+- Sector
+- Jurisdiction
+- Implementing authority
+- Project reference
+- Fiscal year
+- Funding source
+- Approved budget if known
+- Currency
+- Contractor if publicly verified
+- Dates
+- Technical specifications
+- Evidence source
+- Disclosure status
+
+PROJECT STATUS
+
+IDENTIFIED
+SOURCE_REVIEW
+REGISTERED
+PLANNING
+CONTRACTING
+IMPLEMENTATION
+COMPLETION_REPORTED
+TECHNICAL_VERIFICATION
+HANDED_OVER
+CLOSED
+SUSPENDED
+CANCELLED
+DISPUTED
+
+PROJECT FINANCE
+
+Record financial events using explicit types:
+
+APPROPRIATED
+APPROVED
+RELEASED
+DISBURSED
+COMMITTED
+PAID
+SPENT
+REFUNDED
+ADJUSTED
+
+Use decimal values, not floating-point arithmetic.
+
+Preserve currency and reporting periods.
+
+Do not combine inconsistent financial event types into a misleading total.
+
+Do not equate appropriated funds with money received.
+
+Do not equate disbursements with final expenditure.
+
+FINANCIAL EVIDENCE
+
+Every financial event must link to:
+- Source
+- Document or official record
+- Recording user
+- Recording time
+- Verification status
+- Reviewer
+- Applicable fiscal year
+
+Verification states:
+
+UNVERIFIED
+UNDER_REVIEW
+VERIFIED
+DISPUTED
+RETRACTED
+
+DUAL-KEY TRANSPARENCY WORKFLOW
+
+When a funding or project notice is recorded:
+
+1. Preserve the original source document.
+2. Identify the responsible implementation agency.
+3. Identify the relevant thematic community board.
+4. Make the authorized notice available to both participating sides.
+5. Record independent acknowledgements.
+6. Notify relevant community monitors.
+7. Track implementation and evidence.
+8. Publish approved information.
+
+Do not fabricate government acknowledgement.
+
+Do not imply the Community Board controls public funds.
+
+MILESTONE SYSTEM
+
+Each milestone includes:
+- Description
+- Planned date
+- Actual date
+- Weight
+- Acceptance criteria
+- Evidence
+- Reported progress
+- Verified progress
+- Status
+- Responsible party
+
+Validate milestone weights for an approved baseline.
+
+Changes must create a new project version.
+
+INSPECTIONS
+
+Allow authorized monitors to:
+- Record site visit
+- Upload photographs
+- Capture approximate/verified site location
+- Record observations
+- Describe risks
+- Request further evidence
+- Submit inspection report
+- Sign off the report
+
+Distinguish physical inspections from remote document reviews.
+
+VARIANCE ALERTS
+
+Implement deterministic review flags for:
+- Overdue milestone
+- Missing funding source
+- Conflicting financial record
+- Missing inspection evidence
+- Inconsistent reported progress
+- Duplicate project reference
+- Community dispute
+- Unverified completion claim
+
+A variance flag must not automatically establish wrongdoing.
+
+PUBLIC TRANSPARENCY
+
+Create public project pages displaying approved:
+- Project name
+- Sector
+- Location at an appropriate public precision
+- Implementing authority
+- Approved public funding information
+- Milestones
+- Reported progress
+- Verified progress
+- Published inspections
+- Community feedback summary
+
+Protect personal information and confidential contract or security information where legally required.
+
+DASHBOARD
+
+Provide filters for:
+- State
+- LGA
+- Ward
+- Board
+- Funding source
+- Fiscal year
+- Project status
+- Verification status
+
+Provide charts, summary tables and downloadable authorized reports.
+
+Use real database queries.
+
+TESTS
+
+Test:
+- Project creation
+- Verification restrictions
+- Funding record creation
+- Financial amount precision
+- Project amendments
+- Milestone versioning
+- Inspection permissions
+- Variance detection
+- Completion verification
+- Public data redaction
+
+PHASE COMPLETION
+
+Demonstrate a synthetic public project with:
+- Approved funding entry
+- Source documentation
+- Two or more milestones
+- Board monitoring assignment
+- Site inspection
+- Progress tracking
+- Variance review
+- Completion evaluation
+
+All changes must have provenance and audit history.
+
+Run checks and update documentation.
+
+
+
+8. Phase 6 — Meetings, voting and resolutions
+
+EXECUTE PHASE 6 — MEETINGS AND RESOLUTIONS
+
+Implement the formal board meeting and decision-management system.
+
+SCREENS
+
+MT-01 Meeting Calendar
+MT-02 Create Meeting
+MT-03 Meeting Invitations
+MT-04 Meeting Detail
+MT-05 Attendance and Quorum
+MT-06 Agenda and Deliberations
+MT-07 Voting and Decisions
+MT-08 Meeting Minutes
+MT-09 Resolution Register
+MT-10 Action Tracker
+MT-11 Public Meeting Forum
+MT-12 Meeting Archive
+
+DATABASE
+
+Implement:
+
+meetings
+meeting_agendas
+meeting_invitations
+meeting_attendance
+quorum_snapshots
+motions
+ballots
+voting_rounds
+meeting_minutes
+minute_versions
+resolutions
+resolution_actions
+meeting_documents
+meeting_audit_events
+
+MEETING CREATION
+
+Required:
+- Board ID
+- Meeting title
+- Meeting type
+- Date and time
+- Timezone
+- Venue or online participation information
+- Agenda
+- Visibility classification
+- Convening authority
+
+Authorize meeting creation according to board role and governance charter.
+
+MEETING STATES
+
+DRAFT
+SCHEDULED
+NOTICE_ISSUED
+CONVENED
+ADJOURNED
+MINUTES_PENDING
+MINUTES_APPROVED
+ARCHIVED
+CANCELLED
+
+QUORUM ENGINE
+
+Use the effective governance charter.
+
+Determine:
+- Voting members eligible at the meeting date
+- Members present
+- Suspended or expired appointments
+- Quorum threshold
+- Agenda-specific conflicts
+- Voting eligibility for each motion
+
+Calculate quorum on the server.
+
+For formally binding board decisions, require a valid quorum snapshot.
+
+If governance rules are missing, prevent formal voting and show an appropriate configuration error.
+
+VOTING
+
+Support:
+- Recorded in-person vote
+- Electronic vote
+- Abstention
+- Unanimous consent where allowed
+- Deferred vote
+- Separate voting rounds
+
+Each vote must reference:
+- Motion
+- Eligible member
+- Voting round
+- Choice
+- Submission time
+- Applicable policy version
+
+Enforce one effective vote per eligible member per round.
+
+Do not allow conflicted members to vote on restricted motions.
+
+VOTING RESULTS
+
+Calculate:
+- Eligible voters
+- Members participating
+- Yes votes
+- No votes
+- Abstentions
+- Required threshold
+- Final decision
+
+Use the charter rule applicable to that motion.
+
+Record all calculations and the governing charter version.
+
+MINUTES
+
+Provide structured fields:
+- Meeting header
+- Attendance
+- Quorum
+- Agenda items
+- Decisions
+- Motions
+- Vote results
+- Action items
+- Attachments
+- Approval
+
+Minutes workflow:
+
+DRAFT
+SUBMITTED_FOR_REVIEW
+CORRECTIONS_REQUESTED
+APPROVED
+PUBLISHED
+ARCHIVED
+
+Lock approved versions.
+
+Corrections must be versioned.
+
+RESOLUTIONS
+
+Every resolution must reference a valid source meeting and approved decision.
+
+Capture:
+- Reference number
+- Board
+- Meeting
+- Subject
+- Resolution text
+- Motion
+- Voting result
+- Adoption date
+- Approval status
+- Publication status
+- Assigned actions
+- Supporting documents
+
+Do not portray a board recommendation as a binding order to a government institution.
+
+ACTION TRACKER
+
+Authorized officers can create follow-up tasks.
+
+Each task needs:
+- Resolution ID
+- Owner
+- Due date
+- Status
+- Evidence
+- Completion reviewer
+
+Institutional tasks should only be recorded as accepted assignments where the institution has acknowledged them.
+
+Otherwise record a pending request.
+
+PUBLIC RECORDS
+
+Create public pages for approved meeting notices and publishable resolutions.
+
+Do not expose confidential minutes, private deliberations or sensitive attachments.
+
+TESTS
+
+- Meeting creation
+- Invalid convening authority
+- Attendance verification
+- Expired member exclusion
+- Quorum calculation
+- Conflict-recusal restrictions
+- Duplicate vote rejection
+- Valid vote adoption
+- Missing quorum blocking
+- Minute approval and locking
+- Resolution creation
+- Resolution action tracking
+- Public/private disclosure controls
+
+PHASE COMPLETION
+
+Demonstrate:
+- Authorized secretary creates a meeting.
+- Eligible members receive invitations.
+- Attendance is recorded.
+- Quorum is validated.
+- A motion is proposed.
+- Eligible members vote.
+- A decision is computed.
+- Minutes are submitted and approved.
+- A resolution is recorded.
+- An action is assigned and tracked.
+
+Run tests and document results.
+
+
+
+9. Phase 7 — Dashboards, public website and mobile application
+
+EXECUTE PHASE 7 — DASHBOARDS, UI/UX AND MOBILE
+
+Finalize all user-facing and officer-facing application interfaces.
+
+DESIGN SYSTEM
+
+Use these proposed colors:
+
+Primary Green: #126B50
+Institutional Navy: #162B43
+Accent Gold: #D5AD59
+Light Canvas: #F5F7F4
+Alert Red: #B64A43
+
+Use accessible contrast and readable text.
+
+Do not rely solely on color to communicate status.
+
+Create reusable design components:
+- Buttons
+- Form inputs
+- Dropdowns
+- Search selectors
+- Cards
+- Tables
+- Data filters
+- Status badges
+- Timelines
+- Modal dialogs
+- Confirmation flows
+- Notification panels
+- File uploaders
+- Accessible tabs
+- Empty states
+- Error states
+- Loading states
+- Pagination controls
+- Mobile navigation
+
+CITIZEN APPLICATION
+
+Implement:
+
+Home
+My Community
+Report Issue
+My Cases
+Case Detail
+Project Directory
+Project Detail
+Community Board Directory
+Public Meetings
+Public Resolutions
+Notifications
+Profile
+Account Security
+Privacy Requests
+
+BOARD PORTAL
+
+Implement:
+
+Board Dashboard
+Membership Register
+Candidate Screening
+Appointments
+Conflicts
+Assigned Cases
+Case Investigation
+Projects
+Financial Records
+Inspections
+Meetings
+Quorum
+Voting
+Minutes
+Resolutions
+Action Tasks
+Reports
+
+ADMINISTRATION
+
+Implement:
+
+Geographic Registry
+Organizations
+Board Configuration
+Role Grants
+Charter Configuration
+Review Queues
+Privacy Request Management
+Audit Viewer
+Notification Templates
+System Health Summary
+
+DASHBOARDS
+
+Use real backend queries.
+
+Provide aggregate metrics including:
+- Registered and verified members
+- Active boards
+- Cases by status
+- Case resolution measures
+- Projects by status
+- Funding disclosures by verification
+- Meetings conducted
+- Resolutions adopted
+- Overdue actions
+
+All numeric metrics must have definitions and source queries.
+
+Never display hardcoded fictional figures on production dashboards.
+
+PUBLIC WEBSITE
+
+Create:
+- Home
+- About CBS
+- How Community Boards Work
+- Seven Thematic Boards
+- Public Project Directory
+- Public Resolution Directory
+- Community Lookup
+- Privacy Policy
+- Terms and Governance
+- Contact / Support
+
+Display clear information about the actual legal operator and the application's institutional status.
+
+Do not falsely imply endorsement by Nigerian government agencies or the African Union.
+
+MOBILE APPLICATION
+
+Build React Native / Expo screens for the citizen workflows.
+
+Implement secure authentication, API integration, accessible navigation and case/project viewing.
+
+Allow offline drafts where feasible.
+
+Never indicate that a report was submitted until the server confirms submission.
+
+Implement retry-safe synchronization.
+
+LANGUAGE SUPPORT
+
+Start with English.
+Prepare locale files and translation architecture for Hausa, Yoruba, Igbo and other languages.
+
+Do not release poor machine translations as verified official translations.
+
+ACCESSIBILITY
+
+Target WCAG 2.2 AA.
+
+Implement:
+- Semantic controls
+- Keyboard navigation
+- Focus management
+- Screen-reader labels
+- Form error descriptions
+- Adequate touch targets
+- Appropriate contrast
+- Reduced-motion support where relevant
+
+TESTS
+
+Perform Playwright end-to-end tests for critical web workflows.
+
+Add appropriate React Native component and integration tests.
+
+Verify responsive layouts.
+
+Check authentication and authorization behavior across interfaces.
+
+PHASE COMPLETION
+
+All core screens must connect to real APIs.
+
+No production-facing placeholder metrics or dead-end buttons.
+
+Document any future-release features.
+
+Run tests, lint, typecheck and build.
+
+
+
+10. Phase 8 — Security hardening, deployment and final verification
+
+EXECUTE PHASE 8 — PRODUCTION READINESS
+
+Perform the final engineering, security and quality assurance work.
+
+SECURITY AUDIT
+
+Review:
+- Authentication
+- Session handling
+- Authorization
+- Jurisdiction restrictions
+- Board appointment privileges
+- Conflict-of-interest restrictions
+- Case privacy
+- Evidence storage
+- Public project disclosure
+- Financial records
+- Meeting voting integrity
+- Audit logs
+- Rate limiting
+- File upload handling
+- Security headers
+- Secrets management
+- Dependency vulnerabilities
+
+Verify that a PLATFORM_ADMIN cannot automatically read highly restricted case information.
+
+Add explicit break-glass procedures if emergency privileged access is required, including authorization, justification, limited duration and enhanced audit.
+
+PRIVACY
+
+Implement:
+- Privacy notices
+- Consent/preference management where applicable
+- Data access requests
+- Correction requests
+- Authorized deletion or restriction workflows
+- Retention schedules
+- Public data redaction
+- Data export controls
+
+Do not promise deletion of legally required audit or case records when retention obligations apply.
+
+TESTING
+
+Run:
+- Unit tests
+- Integration tests
+- API tests
+- End-to-end tests
+- Role/permission tests
+- Security-focused tests
+- Accessibility checks
+- Performance smoke tests
+- Migration verification
+- Backup restoration test
+
+Fix all critical and high-severity implementation defects discovered.
+
+DEPLOYMENT
+
+Provide:
+- Production Dockerfiles
+- Environment variable documentation
+- Infrastructure-as-code templates
+- Reverse proxy/TLS guidance
+- Database migration workflow
+- Object storage configuration
+- Worker configuration
+- Backup and restoration instructions
+- Monitoring configuration
+- Deployment checklist
+- Rollback procedure
+- Incident response runbook
+
+Do not deploy to an external production environment without explicit authorization and credentials.
+
+SEED AND DEMONSTRATION DATA
+
+Provide synthetic demonstration data for:
+- One test state or region
+- One test LGA
+- One test ward
+- One test community
+- Seven board types
+- Approved sample board
+- Synthetic board members
+- Sample complaints
+- Sample projects
+- Sample financial events
+- Sample meeting
+- Sample resolution
+
+Every fixture must be clearly marked SYNTHETIC.
+
+Do not ship real user credentials or insecure default passwords.
+
+END-TO-END ACCEPTANCE
+
+Demonstrate the following:
+
+1. Start the application locally.
+2. Register and authenticate a synthetic resident.
+3. Associate the resident with a test community.
+4. Create and approve a board instance.
+5. Nominate, screen and appoint a board member.
+6. Submit a citizen complaint.
+7. Triage, assign and investigate the case.
+8. Propose and verify an outcome.
+9. Register a public project.
+10. Record financial disclosure and milestones.
+11. Perform a documented project inspection.
+12. Schedule a board meeting.
+13. Verify attendance and quorum.
+14. Conduct a valid vote.
+15. Approve meeting minutes.
+16. Publish an eligible resolution.
+17. Assign an action from the resolution.
+18. Verify restricted data is not publicly accessible.
+19. Verify prohibited cross-jurisdiction actions are denied.
+20. Generate project and case dashboards from actual stored records.
+
+FINAL ARTIFACTS
+
+Produce:
+- Complete source code
+- Database migrations
+- Seed scripts
+- OpenAPI specification
+- Automated tests
+- Environment template
+- README
+- Local deployment instructions
+- Production deployment guide
+- Security report
+- Test report
+- Known issues list
+- Implementation status report
+
+FINAL REPORT
+
+Clearly distinguish:
+- Implemented and tested
+- Implemented but not tested
+- Partially implemented
+- Not implemented
+- Blocked by external data or approval
+
+Do not claim production readiness if critical tests or security reviews fail.
+
+Fix all feasible outstanding issues.
+
+Return the exact commands necessary for a developer to start the application locally.
+
+
+
+
+11. How to execute this in Codex
+
+Step 1 — Create the repository
+
+Create a new project folder named community-board-system and open it in your Codex development environment. Use an empty repository for a fresh build.
+
+
+
+Step 2 — Submit the master instruction
+
+Copy Section 1 into Codex. Then submit the Phase 1 instruction to begin creating the actual project structure.
+
+
+
+Step 3 — Execute phases in order
+
+Give Codex Phases 2–8 sequentially. Each phase should build on the existing repository, not start a new project. Review the phase report and test results before proceeding.
+
+
+
+Step 4 — Validate the application
+
+Use the synthetic pilot accounts to test registration, board appointments, complaints, project monitoring, meetings and resolutions. Complete institutional, legal and security approvals before real public deployment.
+
+
+
+When the environment is configured and dependencies are installed, Codex should provide and verify local commands similar to:
+pnpm install
+pnpm infra:up
+pnpm db:migrate
+pnpm db:seed
+pnpm dev
+
+
+These commands are a target development interface, not a claim that a working repository already exists. Codex must create the scripts and confirm they run successfully.
+12. Permanent instruction for maintaining continuity
+Add the following file to the repository as AGENTS.md. It will help coding agents preserve the agreed architecture during later development.
+
+# COMMUNITY BOARD SYSTEM — ENGINEERING RULES
+
+This repository implements the Community Board System (CBS).
+
+## Product boundaries
+
+The initial production scope consists of five modules:
+
+1. Identity, Geography and Jurisdiction
+2. Board Membership and Administration
+3. Citizen Reporting and Case Management
+4. Project and Funding Oversight
+5. Meetings and Resolutions
+
+Seven principal thematic boards must always be preserved:
+EDU, HLT, SEC, INF, TRD, YTH, CUL.
+
+## Engineering rules
+
+- Inspect existing code before modifications.
+- Preserve functional modules and user data.
+- Use TypeScript strict mode.

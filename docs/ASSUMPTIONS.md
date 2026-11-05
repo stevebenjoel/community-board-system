@@ -1,0 +1,14 @@
+# Specification reconciliation
+
+All three supplied documents were reviewed. The strategic paper is the vision; the screen/SRS document defines requirements; the executable instructions supply the five-module implementation order. User instructions take precedence over their suggested stack.
+
+1. Appwrite is the production backend: authentication and TablesDB. A Node TypeScript policy gateway mediates every CBS record read/write; no browser receives a server key or direct database permission. Coolify runs the gateway and compiled React/Vite application in one container.
+2. Preserve the existing React/Vite workspace rather than replace it with Next.js/NestJS/PostgreSQL/Prisma/Redis/S3. Their proposed roles are adapted to Appwrite and transactional domain aggregates. Separate citizen and board experiences share a responsive shell and API policy engine. This is a pilot modular application, not the proposed full multi-app/Turborepo deployment.
+3. Five modules and all seven board codes are mandatory. AI, marketplaces, academy, live emergency dispatch and external institutional integrations are later releases.
+4. No credentials, domains, official geography dataset, operator identity, or adopted charter were supplied. None is invented or requested during the build. Production integration remains disconnected until provided. Synthetic local SQLite is a test adapter, never a replacement production backend.
+5. The local test profiles simulate contact verification and MFA and are available only on loopback. They have no real passwords and cannot be used in production. Appwrite account registration, verification, recovery and MFA use its SDK.
+6. Six zones and 37 state/FCT names are a maintained name reference. IDs are internal UUIDs, not official codes. There are no invented real LGAs, wards or communities. A separate clearly SYNTHETIC jurisdiction demonstrates workflows.
+7. Charter settings in fixtures are SYNTHETIC. A real board requires adopted authority and independently approved establishment. Software records an authority reference; it cannot determine that a legal instrument is valid.
+8. Explicit workflow commands replace the suggested many-resource REST mutation routes. Their exact payload schemas are generated in `docs/openapi.json`. API root remains `/api/v1`.
+9. Evidence now supports private binary case/project attachments and textual source references. A real ClamAV adapter is provided; unconfigured/unavailable scanning quarantines files and blocks downloads. Live Storage/scanner validation, document signing, institutional attestations, SMS and email case-notification delivery remain pending and are not silently simulated.
+10. Native citizen source is staged under `mobile/` with an official Expo setup script. It has not been installed, compiled, or tested on a device. Mobile web is implemented; formal WCAG and native acceptance remain pending.

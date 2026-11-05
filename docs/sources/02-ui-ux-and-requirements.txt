@@ -1,0 +1,1555 @@
+COMMUNITY BOARD SYSTEM (CBS)
+Complete UI/UX, Software Requirements and Technical Build Specification
+Version 1.0 · Nigeria National Framework · 3 November 2026
+Implementation Blueprint
+
+Priority modules
+5
+
+Thematic boards
+7
+
+Initial jurisdiction
+
+Nigeria
+
+Development approach
+
+Modular, API-first
+
+
+
+Purpose: Provide an actionable specification for software architects, UI/UX designers, database engineers, application developers, security reviewers and pilot implementation teams.
+
+Part I — Product foundation
+1. Executive product definition
+The Community Board System will be a secure digital platform for organizing community representation, managing thematic boards, receiving and resolving citizen complaints, monitoring public development projects, and documenting community decisions.
+
+It will support a five-level organizational structure:
+National Secretariat
+
+Policy, governance standards and national monitoring
+
+6 Zonal Coordinating Boards
+
+Regional coordination and oversight
+
+State / FCT Coordination
+
+Operational support and jurisdictional reporting
+
+774 LGA / Area Council Boards
+
+Seven thematic boards and public-service interfaces
+
+Ward Boards and Community Meeting Points
+
+Citizen participation, cases and project observations
+
+
+The uploaded YADEI document provides the national, zonal, LGA, ward and polling-unit organizational concept. I have added explicit state/FCT coordination as a proposed operational software layer; it is not a replacement for the original governance chart.
+
+Official INEC delimitation data provides a baseline of 774 LGAs/area councils, 8,809 registration areas/wards and 176,846 polling units. These figures are also consistent with the source document's proposed footprint. 
+Independent National Electoral Commission+1
+
+
+Important architectural distinction: Polling units can be used as geographic references or community meeting locations, but the platform must not treat INEC polling units as CBS-owned institutions, electoral authorities or proof of a person's voting registration. Community membership will be based on verified service jurisdiction and residency, not political affiliation or voter preference.
+2. Seven boards preserved
+Code	Thematic board	Primary oversight
+EDU	Board of Education	Schools, learning, education infrastructure
+HLT	Board of Health	Primary healthcare and community health
+SEC	Board of Security and Intelligence Gathering	Lawful safety reporting and security coordination
+INF	Board of Infrastructure	Roads, power, water, housing and infrastructure
+TRD	Board of Trade, Investment and Tourism	Enterprise, agriculture, investment and trade
+YTH	Board of Skills and Youth Development	Vocational skills, youth employment and development
+CUL	Board of Culture and Moral Values	Heritage, civic ethics and social cohesion
+
+These will be seeded as permanent reference definitions within the software.
+
+The application will permit subcommittees under each board and additional thematic boards in future, but the seven principal boards cannot be deleted or silently renamed by an ordinary administrator.
+3. Release boundaries
+Version 1
+Included: Identity and geographic onboarding; board membership and administration; citizen complaints and case management; projects and funding oversight; meetings, resolutions, notifications, search, reports and auditing.
+
+
+Future release
+Full early-warning command centre, direct emergency dispatch, extensive AI analytics, e-learning, trade marketplace and advanced interagency integrations.
+
+
+Version 1 will still permit restricted safety complaints to be referred to an authorized organization, but it must not pretend to provide live emergency dispatch before appropriate agreements and operational capacity exist.
+4. Product acceptance principles
+A successful implementation must satisfy the following:
+1. A resident can register and find the appropriate community jurisdiction without unnecessary data collection.
+2. A board officer cannot operate outside their formally authorized jurisdiction.
+3. Board appointment, tenure, conflicts and resignations are traceable.
+4. Every complaint has an owner, progress history and review pathway.
+5. Every monitored public project distinguishes documented facts from community observations.
+6. Funding disclosures retain source evidence and verification status.
+7. Every formal board resolution has an accountable meeting record, quorum result and voting record.
+8. Confidential records cannot leak through public pages, search, notifications or exports.
+9. No administrator can erase the historical audit trail through the ordinary application.
+10. The platform works on low-bandwidth mobile connections and remains usable through assisted community access.
+
+Part II — UI/UX design system
+5. Product appearance
+I recommend a modern African civic-institutional visual identity, based on green, deep navy, warm neutrals and white. The interface should look trustworthy and professional, without misleading users into thinking it is an official government application unless formally authorized.
+Recommended design tokens
+
+Primary
+
+#126B50
+
+
+Navy
+
+#162B43
+
+
+Accent
+
+#D5AD59
+
+
+Canvas
+
+#F5F7F4
+
+
+Alert
+
+#B64A43
+
+
+Colors are proposed design tokens; text contrast and status colors must be validated to WCAG 2.2 AA requirements.
+
+Recommended fonts: Inter for general interfaces, with a properly supported multilingual font fallback. Minimum body font size should generally be 16 px on mobile. Interface controls should be touch-friendly, keyboard accessible and screen-reader compatible.
+
+The user experience must support:
+- English initially, with an internationalization framework for Hausa, Yoruba, Igbo and other languages.
+- Searchable forms instead of long unfiltered dropdowns.
+- Save-and-resume forms.
+- Plain-language validation errors.
+- Mobile camera uploads with automatic compression.
+- Offline draft storage on supported devices.
+- SMS or email notifications where available.
+- Status indicators that always include text, not only color.
+- WCAG-aligned accessible labels and assistive technology support.
+6. Application navigation
+Citizen mobile navigation
+Home
+
+My Cases
+
+Projects
+
+Community
+
+My Profile
+
+
+
+Board web navigation
+Dashboard
+
+Members
+
+Cases
+
+Projects & Funds
+
+Meetings
+
+Resolutions
+
+Reports
+
+
+
+
+Public-facing pages will be separate from authenticated administrative screens.
+
+All desktop dashboards must be responsive down to tablet widths. Critical citizen functionality should be mobile-first.
+
+Part III — Complete screen-by-screen specification
+The screen inventory below defines the first build. Screen IDs should remain stable across design files, engineering tickets, automated tests and API documentation.
+Module 1 — Identity, geography and jurisdiction
+Module identifier: CBS-IDENTITY
+
+Objective: Create trustworthy user identities and associate every account, board and case with the correct organizational and geographic jurisdiction.
+7. Module 1 screen register
+ID	Screen	Required behavior
+ID-01	Welcome / Language Selection	Select language, view access options and privacy links
+ID-02	Login	Email/phone login, passkey or password where supported
+ID-03	Registration	Collect minimum personal details and account type
+ID-04	Verification	One-time code, resend, expiry and retry handling
+ID-05	Location Selection	State/FCT → LGA → ward → community
+ID-06	Residency Verification	Submit approved evidence or request manual review
+ID-07	Profile Completion	Contact preferences and optional demographic details
+ID-08	Citizen Dashboard	Show community, cases, meetings and projects
+ID-09	My Community	View geography and board contacts
+ID-10	Account Security	MFA, active sessions, recovery and sign-out
+ID-11	Privacy and Data Rights	Consent preferences, access, correction and requests
+ID-12	Jurisdiction Change	Request relocation or community reassignment
+
+ID-03 — Registration screen
+Create your CBS account
+
+Step 1 of 3
+
+Full name
+
+Phone number
+
+Account type
+Community resident
+
+Community facilitator (approval required)
+
+Organization representative (verification required)
+
+
+
+Preview registration flow This is an illustrative form preview, not an active user-registration service. No information entered here is submitted to CBS.
+Field specification
+Field	Type	Validation / rules
+full_name	Unicode text	Required, 2–150 characters
+contact_phone	E.164 phone	Required if phone chosen; verified
+email	Email	Optional alternative login contact
+account_type	Enum	Resident, facilitator, organization
+preferred_language	Locale code	Supported language list
+terms_version	Version reference	Required acknowledgment
+privacy_notice_version	Version reference	Display and record notice delivery
+verification_status	Enum	Pending, verified, manual-review, rejected
+
+A general privacy notice acknowledgment is not the same as consent to optional data processing. Store separate legal bases and preferences as applicable.
+
+Behavioral requirements
+- Reject duplicate verified contact identities, but provide secure recovery and account-merge review rather than silently merging.
+- Rate-limit verification attempts.
+- Provide expiry for one-time codes and avoid revealing account existence through password recovery.
+- Require stronger authentication for privileged accounts.
+- Do not allow users to self-assign a board officer role.
+- Provide a safe verification-failure and support route.
+ID-05 — Geography and jurisdiction screen
+Select your community
+State / FCTSelect state
+
+Local Government / Area Council
+
+Ward
+
+Community / settlement
+
+Community verification
+
+Your selected jurisdiction determines which boards, projects, consultations and service contacts appear in the application.
+
+Layout prototype. The production screen will load authoritative searchable geographic records.
+Geographic data requirements
+
+The data model must maintain separate records for:
+
+country → state/FCT → LGA/area council → ward → community/settlement
+
+Polling units should be stored as a parallel electoral-geography reference linked to the applicable ward, not made mandatory ancestors of every settlement.
+
+Each geographic record needs a stable internal UUID, official code where available, official name, alternative names, parent ID, effective date, status, source reference and optional verified boundary geometry.
+
+The platform must handle spelling differences, renamed locations, ambiguous community names, missing mapping coordinates and future revisions without corrupting historical cases.
+ID-06 — Residency verification
+Supported methods should include manual verification by designated trained officers, authorized document review, verified community address records or approved institutional attestation.
+
+Requirements:
+- Store verification type and outcome separately from sensitive document contents.
+- Make identity documentation optional unless specifically required for the selected action.
+- Provide reasonable alternatives for residents without formal documentation.
+- Restrict document visibility.
+- Record verification expiry and reviewer identity.
+- Provide an appeal route after rejection.
+A verified resident may participate in the appropriate local community. Unverified residents should still be able to access public information and suitable complaint channels.
+ID-08 — Citizen home dashboard
+The citizen dashboard must display community name, applicable board directory, active reports, recent resolutions, public projects, meeting announcements and important notifications.
+
+It should offer prominent actions for Report an Issue, View My Cases, Track Projects, and Community Meetings.
+
+No confidential information about other residents should be displayed.
+
+Module 2 — Board membership and administration
+Module identifier: CBS-BOARDS
+
+Objective: Digitally establish and manage governing bodies, thematic boards, membership, verified appointments, responsibilities, training status, tenure and conflicts of interest.
+8. Module 2 screen register
+ID	Screen	Required behavior
+BD-01	Board Directory	List all seven boards by jurisdiction
+BD-02	Board Profile	Mandate, composition, members and public contact
+BD-03	Board Creation	Create board instance from approved template
+BD-04	Nomination / Application	Submit a candidate or application
+BD-05	Candidate Screening	Eligibility, residency, references and review
+BD-06	Appointment Approval	Approved appointing authority and decision record
+BD-07	Membership Register	Active, suspended, resigned and expired appointments
+BD-08	Member Detail	Verified credentials, appointments and service record
+BD-09	Roles and Delegation	Assignment of chairperson, secretary and roles
+BD-10	Conflict of Interest	Register disclosures, recusals and restrictions
+BD-11	Committees and Tasks	Manage committees, assignments and follow-up
+BD-12	Tenure and Removal	Renewal, resignation, suspension, appeals and revocation
+
+BD-01 — Board directory
+Community Boards
+7 boards
+
+
+Education
+
+Board code: EDU
+
+
+
+
+Health
+
+Board code: HLT
+
+
+
+
+Security & Intelligence
+
+Board code: SEC
+
+
+
+
+Infrastructure
+
+Board code: INF
+
+
+
+
+Trade, Investment & Tourism
+
+Board code: TRD
+
+
+
+
+Skills & Youth Development
+
+Board code: YTH
+
+
+
+
+Culture & Moral Values
+
+Board code: CUL
+
+
+
+
+
+A board directory must display only authorized official board instances and distinguish active, proposed, suspended and archived bodies.
+BD-03 — Board creation
+Required fields
+Field	Type
+Board template	One of seven permanent board definitions
+Jurisdiction	Linked LGA or ward
+Legal / operating authority	Charter, resolution or signed agreement reference
+Establishment date	Date
+Board status	Draft, pending approval, active, suspended, archived
+Membership capacity	Approved configurable integer
+Term policy	Approved tenure-policy version
+Appointing authority	Verified organization/role
+Public description	Text
+Official documents	Controlled file attachments
+
+The workflow must be Draft → Submitted → Reviewed → Approved → Active.
+
+Creation must be idempotent so that the same board type cannot accidentally be established twice within the same jurisdiction and effective period.
+
+An approved board cannot be deleted if membership, cases, meetings or resolutions have been recorded. It may only be deactivated and historically preserved.
+BD-04 to BD-06 — Nomination and appointment
+The appointment process must include:
+1. Candidate application or nomination.
+2. Candidate notice and acceptance.
+3. Identity and eligibility review.
+4. Residency verification where required.
+5. Professional or stakeholder qualification verification.
+6. Conflict-of-interest disclosure.
+7. Independent screening.
+8. Recorded appointing-authority decision.
+9. Digitally signed appointment record.
+10. Activation of the member's specific permissions.
+Separation-of-duties rule: The candidate, screening officer and final approver cannot be the same person for the same appointment.
+
+A nomination must never automatically grant administrative access.
+BD-08 — Member profile
+Public-facing member information should include only approved information such as name, board position, service period, professional category and official contact channel.
+
+Internal records may contain verified residency status, appointment history, required training, disciplinary restrictions and conflict disclosures, subject to strict access controls.
+BD-10 — Conflict-of-interest manager
+Illustrative conflict-of-interest record
+Declaration COI-0021
+Review required
+
+
+Matter: Infrastructure project inspection
+
+Declared relationship: Personal connection to a contractor
+
+Proposed restriction: Exclude member from project assessment and related voting
+Access restrictions remain pending until the authorized ethics reviewer records the decision. The example is fictional.
+
+
+The system must enforce recorded recusals, log restricted decisions and notify the appropriate independent reviewer.
+
+A conflicted board member must not be able to approve their own recusal, award a related contract through CBS, or vote on a formally restricted matter.
+BD-12 — Tenure and removal
+All appointment records must be effective-dated.
+
+Revocation must terminate privileged sessions promptly. Removal requires a reason category, the competent authority, a documented decision, an appeal route and an audit trail.
+
+The uploaded source recommends unpaid voluntary membership but does not fully determine all tenure, disciplinary and appointment procedures. These must remain configurable until the adopted governance charter supplies the controlling rules.
+
+Module 3 — Citizen reporting and case management
+Module identifier: CBS-CASES
+
+Objective: Give every citizen an accessible way to raise concerns and receive traceable, fair and properly reviewed responses.
+9. Module 3 screen register
+ID	Screen	Required behavior
+CS-01	Issue Category Selection	Select issue type and guidance
+CS-02	Report Issue	Complete report with optional evidence
+CS-03	Submission Confirmation	Generate case ID and next-step guidance
+CS-04	My Cases	List resident's submitted cases
+CS-05	Case Detail	Status timeline, updates and responses
+CS-06	Case Inbox	Assigned board or officer work queue
+CS-07	Triage and Assignment	Validate, classify, route and prioritize
+CS-08	Investigation Workspace	Evidence, inspection notes, actions and referrals
+CS-09	Interagency Referral	Controlled referral to participating institutions
+CS-10	Resolution Review	Verify outcome and closure evidence
+CS-11	Appeal / Reopen	Review disputed or unsatisfactory outcomes
+CS-12	Case Reporting	Trends, delays, work distribution and quality
+
+CS-01 — Issue category selection
+Every case should use a controlled taxonomy.
+Category	Default destination
+School infrastructure or education	Education Board
+Public healthcare or sanitation	Health Board
+Roads, drainage, water, public infrastructure	Infrastructure Board
+Community safety or threat report	Restricted safety intake
+Markets, enterprise, trade and investment	Trade Board
+Youth training or employment support	Skills and Youth Board
+Cultural facilities or civic cohesion	Culture and Moral Values Board
+Other government service complaint	Jurisdictional triage queue
+Complaint against a board member	Independent conduct-review channel
+
+Classification should be assisted by software rules, but users must be able to correct inappropriate classifications.
+CS-02 — Report issue
+Report a community issue
+Illustrative reporting formIssue categoryRoads, water or infrastructure
+
+Issue title
+
+Describe the problem
+
+Visibility preference
+Restricted to authorized case handlers
+
+Request an anonymized public summary
+
+
+In the production application, photo/document uploads, approximate location, draft saving and contact preferences will be provided. Public summaries require a separate safety review.
+
+Review sample case design
+Required report fields
+Field	Required?	Specification
+Category	Yes	Controlled taxonomy
+Subject	Yes	5–160 characters
+Description	Yes	20–10,000 characters
+Jurisdiction	Yes	Derived from confirmed community, with permitted correction
+Occurrence date	Conditional	Date/time or unknown
+Approximate location	Optional	Map pin, address text or landmark
+Attachments	Optional	Images/PDF/video within configured limits
+Contact preference	Optional	Secure inbox, SMS or email
+Visibility request	Yes	Restricted by default
+Urgency	Suggested	User indication plus trained triage
+Accessibility assistance	Optional	Facilitator or assisted submission
+
+Sensitive reports should never default to public visibility.
+CS-03 — Submission confirmation
+After the server commits a report, the citizen receives:
+- Case ID.
+- Submission timestamp.
+- Current status.
+- Expected acknowledgement target, if a validated service agreement defines one.
+- Instructions for additional evidence.
+- Link to the case.
+- Emergency-contact guidance when relevant.
+No success state should be displayed before the backend confirms that the report was committed.
+CS-05 — Case detail and timeline
+Broken Water Supply
+Example case CBS-2026-0142
+In review
+
+
+
+
+Report received
+
+Citizen submitted report
+
+
+
+
+
+Validation completed
+
+Assigned to Infrastructure Board
+
+
+3
+
+
+
+Investigation
+
+Site assessment pending
+
+
+4
+
+
+
+Authority response
+
+Awaiting responsible service provider
+
+
+5
+
+
+Outcome verification
+
+Citizen review and independent closure
+
+
+
+Illustrative workflow only; actual status changes must be authorized and recorded by the server.
+CS-07 — Triage and assignment
+The triage officer interface must show the submitted report, jurisdiction, possible duplicates, sensitivity, board assignment options and issue category.
+
+Actions:
+
+Validate, Request Information, Assign, Refer, Mark Duplicate, Reject with Reason.
+
+A duplicate case should be linked to a master issue while preserving the individual resident's submission and feedback rights.
+
+Cases should not be rejected merely because they criticize public officials or board members.
+CS-08 — Investigation workspace
+Authorized handlers must be able to:
+- Record factual observations and inspection notes.
+- Request supplementary information.
+- Attach verified evidence.
+- Assign follow-up tasks.
+- Record communication with agencies.
+- Make a recommendation.
+- Escalate unresolved matters.
+- Add restricted internal notes separate from citizen-visible updates.
+Every significant action must be recorded in a server-controlled event history.
+CS-09 — Interagency referral
+Referral records should contain receiving institution, authorized recipient, lawful purpose, limited data package, submission time, delivery confirmation, acknowledgement and follow-up status.
+
+If an agency is not connected, the system should show an external referral route rather than falsely claiming successful electronic transmission.
+CS-10 and CS-11 — Resolution and appeal
+Case closure must distinguish:
+- Action reported: The assigned officer says work was completed.
+- Action verified: Supporting evidence has been reviewed.
+- Citizen accepted: The complainant confirms satisfaction.
+- Closed with disagreement: An authorized reviewer closes the matter while preserving the resident's objection.
+- Reopened: New evidence or approved appeal triggers further work.
+A citizen must be able to challenge closure, request correction and submit additional information through a defined review process.
+
+Recommended case lifecycle
+
+Draft → Submitted → Intake Review → Accepted → Assigned → In Progress → Outcome Proposed → Verification → Closed
+
+Additional branches: Needs Information, Referred, Duplicate Linked, Rejected with Reasons, Disputed, Appealed, Reopened.
+
+The distinction between a board decision and an actual government response must remain visible throughout.
+
+Module 4 — Project and funding oversight
+Module identifier: CBS-PROJECTS
+
+Objective: Enable community boards to monitor development interventions from initial disclosure through funding, implementation, inspection, completion and public verification.
+
+This module implements the document's central principle that community boards should receive information about public interventions and monitor how resources are used.
+
+It is an oversight system, not a substitute for a government treasury, procurement authority or legally mandated accounting platform.
+10. Module 4 screen register
+ID	Screen	Required behavior
+PR-01	Public Project Directory	Search and filter projects
+PR-02	Project Detail	Official project record and evidence
+PR-03	Register Project	Create project from authorized information
+PR-04	Funding Sources	Show agencies, grants and budget lines
+PR-05	Funding Disclosure	Enter and verify funding notifications
+PR-06	Project Milestones	Plan deliverables and completion evidence
+PR-07	Monitoring and Inspection	Conduct documented site inspections
+PR-08	Community Feedback	Record observations and complaints
+PR-09	Variance and Risk Review	Detect delays and documented discrepancies
+PR-10	Completion Verification	Review handover and completion evidence
+PR-11	Project Portfolio Dashboard	Sectoral, geographic and financial reports
+PR-12	Audit and Disclosure History	Source records and change history
+
+PR-01 — Public project directory
+The directory needs search filters for:
+- State, LGA, ward and community.
+- Thematic board.
+- Implementing agency.
+- Funding source.
+- Project stage.
+- Budget range.
+- Fiscal year.
+- Disclosure and verification status.
+Projects without a verified coordinate must appear in the searchable list without a fabricated map location.
+PR-02 — Project detail screen
+Community Health Centre Rehabilitation
+Fictional example · PRJ-2026-0024
+In progress
+
+
+
+
+
+
+
+
+nigeriahealthwatch.medium.com
+
+
+Approved allocation
+₦85m
+
+
+Reported completion
+45%
+
+
+
+Reported progress
+
+45%
+
+
+
+Reported progress is not independently certified completion.
+Implementing authority
+
+Example LGA Health Department
+
+Assigned board
+
+Board of Health
+
+Funding record
+
+Source uploaded, pending verification
+
+Inspection status
+
+Site visit scheduled
+
+
+
+Project Overview
+Funding
+Milestones
+Inspections
+
+Illustrative UI using entirely fictional project information.
+PR-03 — Project registration fields
+Field	Data type	Rule
+Project title	Text	Required
+Description	Rich text	Required
+Sector	Controlled code	Required
+Geographic coverage	Jurisdiction refs	Required
+Implementing authority	Verified organization	Required or explicitly unconfirmed
+Project reference	Text	Preserve source identifier
+Fiscal year	Integer	Required when known
+Funding source	Related record	Multiple allowed
+Approved budget	Decimal currency	May be unknown
+Contractor	Organization ref	Optional, disclosure-controlled
+Start/end dates	Dates	Proposed, contractual or actual designation
+Current stage	Enum	Controlled
+Technical specifications	Attachment/reference	Versioned
+Evidence links	URL/document	Source provenance
+Publishing status	Enum	Draft, under review, public, restricted
+
+A submitted citizen observation should not automatically become an officially verified project record.
+PR-04 and PR-05 — Funding oversight
+Every financial record should identify whether it represents an appropriation, approval, release, disbursement, expenditure, payment certification, contractual commitment or refund.
+
+Required financial record design
+Field	Meaning
+funding_source_id	Organization, programme or budget source
+funding_type	Appropriation, grant, intervention, donation, etc.
+amount	Exact decimal value
+currency	ISO 4217 currency
+financial_event_type	Approved, released, disbursed, spent, etc.
+financial_period	Applicable fiscal or reporting period
+recipient_entity_id	Authorized recipient
+evidence_document_id	Source document
+verification_status	Unverified, under review, verified, disputed
+verified_by	Responsible qualified reviewer
+public_disclosure_level	Visibility control
+
+Do not calculate remaining funding simply by subtracting every payment and commitment from the approved budget; the accounting meaning depends on the financial-event type.
+The dual-key disclosure workflow
+Funding / Project Notice Registered
+Original document, issuing institution and amount
+Implementing Authority
+
+Acknowledges funding information and implementation responsibilities
+
+
+Community Board
+
+Receives monitoring notice and verifies project observations
+
+
+
+Independent project-monitoring record
+Evidence, milestones, inspection and public disclosure
+
+The dual-key approach gives both implementers and community oversight bodies visibility, but the two parties are not given equal legal authority to control public funds.
+
+If the implementing authority has not joined CBS, the application may register a verified publicly available notice and request an official response. It must not fabricate agency acknowledgements.
+PR-06 — Milestone management
+Milestones should include:
+
+title, description, planned_date, actual_date, weight, acceptance_criteria, assigned_party, evidence_required, reported_percent, verified_percent, status.
+
+The sum of active weighted milestones should equal 100%, with validation on approval of the project baseline.
+
+Any change to approved cost, timeline, scope or milestone weights must produce a versioned amendment record.
+PR-07 — Site monitoring
+An authorized board monitor can record:
+- Visit date and location.
+- Inspector identity.
+- Site access status.
+- Observed work.
+- Photographs and documents.
+- Contractor or authority comments.
+- Technical concerns.
+- Recommendation.
+- Follow-up actions.
+A review of supplied photographs alone must not be falsely labeled as a physical site inspection.
+PR-09 — Variance review
+The application should flag potential differences such as:
+- Project reported complete but no acceptance evidence.
+- Milestone deadline exceeded.
+- Released funding lacking related documentary evidence.
+- Conflicting reported progress figures.
+- Complaints about delivered work.
+- Duplicate project entries.
+- Missing source documents.
+Flags should initially be rules-based and require human assessment. They should not automatically assert fraud, misconduct or criminal liability.
+PR-10 — Completion verification
+Completion should require a defined acceptance checklist, evidence, authorized technical confirmation where applicable, and independent board observation.
+
+A project may be recorded as officially certified but disputed by the community, or community-observed complete but not officially certified. The distinction must not be erased.
+
+Module 5 — Meetings and resolutions
+Module identifier: CBS-MEETINGS
+
+Objective: Create accountable, verifiable digital records of board deliberations, decisions, meeting attendance, resolutions and follow-up obligations.
+11. Module 5 screen register
+ID	Screen	Required behavior
+MT-01	Meeting Calendar	List upcoming, past and cancelled meetings
+MT-02	Create Meeting	Set board, agenda, time, venue and participation method
+MT-03	Meeting Invitations	Notify eligible members and guests
+MT-04	Meeting Detail	Agenda, documents, participation and status
+MT-05	Attendance and Quorum	Verify eligible attendance
+MT-06	Agenda and Deliberations	Record motions and discussion outcomes
+MT-07	Voting and Decisions	Conduct authorized board votes
+MT-08	Meeting Minutes	Draft, review and approve minutes
+MT-09	Resolution Register	Publish and track board resolutions
+MT-10	Action Tracker	Assign and monitor implementation tasks
+MT-11	Public Meeting Forum	Approved open meeting records and citizen submissions
+MT-12	Meeting Archive	Search history, records and amendments
+
+MT-02 — Create meeting screen
+Schedule board meeting
+Illustrative layoutBoardSelect board
+
+Meeting title
+
+Meeting dateSelect date...
+
+
+Start time
+
+
+
+Participation method
+Physical
+
+Virtual
+
+Hybrid
+
+
+Agenda
+
+
+Production behavior: only authorized secretaries or delegated officers may schedule formal meetings. Notifications are sent only after successful server-side validation.
+
+
+Meeting records must include timezone-aware timestamps, meeting classification, jurisdiction, access policy, organizers, eligible participants and agenda publication controls.
+MT-05 — Quorum and attendance
+The system must calculate quorum using the board's approved charter and membership eligibility at the time of the meeting.
+
+Suggested inputs:
+- Eligible voting members.
+- Required quorum rule.
+- Confirmed attendance.
+- Attendance verification method.
+- Recorded recusals.
+- Temporary restrictions.
+- Meeting start and adjournment times.
+Quorum calculations must be performed by the backend, never trusted to client-side input.
+
+The uploaded document does not establish a uniform quorum threshold for all boards. This must be a versioned charter setting, not a hardcoded assumption.
+MT-07 — Voting
+Supported decision mechanisms may include:
+- Voice or show-of-hands vote recorded by secretary.
+- Recorded electronic vote for eligible members.
+- Unanimous-consent decision.
+- Deferred decision.
+- Chairperson's procedural ruling where permitted.
+The software should not offer anonymous formal ballots unless the approved rules support them and a suitable privacy-preserving voting design exists.
+
+Voting must validate eligibility, quorum, conflict restrictions and the approved decision threshold.
+MT-08 — Minutes
+Minutes workflow:
+
+Draft → Submitted for Review → Corrections Requested / Approved → Published or Restricted → Archived
+
+Approved minutes should be locked against silent modification. Corrections require an amendment referencing the earlier version.
+
+Meeting recordings, when permitted, should have recording notices, access restrictions and defined retention schedules.
+MT-09 — Resolution register
+Resolution INF-2026-0031
+Illustrative board decision
+Adopted
+
+Resolution to request emergency repairs to the community drainage system
+
+The Infrastructure Board resolves to formally request the relevant public authority to assess and prioritize rehabilitation of the identified drainage corridor.
+
+Voting result
+
+6 in favour, 1 against
+
+Implementation status
+
+Awaiting authority response
+
+
+This is a board recommendation, not a government directive or proof that funding has been approved.
+
+
+Each resolution must include a unique ID, board, meeting, subject, approved text, voting result, effective date, attachments, assigned actions, public visibility classification and amendment history.
+MT-10 — Action tracking
+Each action must have an owner, due date where applicable, source resolution, status, supporting evidence and completion reviewer.
+
+Actions may be assigned to a government partner only where that institution has agreed to participate or accepted the task. Otherwise, CBS should represent the item as a request awaiting institutional acknowledgement.
+
+Part IV — Software requirements specification
+12. User-role and permission architecture
+All permissions must be enforced at the server and database access layers.
+
+The system should combine role-based access control (RBAC) with jurisdiction and context restrictions (ABAC).
+12.1 Permission matrix
+The matrix shows primary capabilities. Own means the user's own record; Scope means authorized jurisdiction or board; Approve means only where the user holds the relevant formal approval authority.
+Role	Case access	Board management	Project access	Meetings
+Public visitor	Public summaries	Public directory	Public records	Public notices
+Verified resident	Own	View public	View/comment	Attend public
+Community facilitator	Assigned assisted intake	View	View	Coordinate
+Board member	Assigned/authorized	View scope	Inspect scope	Participate/vote
+Board secretary	Authorized scope	Manage records	View scope	Prepare/minute
+Board chairperson	Authorized scope	Lead/approve within mandate	Review scope	Chair/approve
+LGA coordinator	Delegated scope	Coordinate	Portfolio review	Supervise
+Partner agency officer	Referred cases	No general editing	Own agency records	Respond
+Ethics reviewer	Conduct cases	Conflict/disciplinary review	Conflict-limited	Review restrictions
+National administrator	Aggregate operational metrics	Configure authorized entities	Aggregate oversight	System governance
+Technical administrator	No default case plaintext access	Technical configuration	No default private access	No default private access
+
+National, zonal and state roles should not automatically imply unrestricted access to confidential records throughout Nigeria.
+12.2 Permission identifiers
+Developers should implement stable permissions such as:
+identity.profile.read_self
+identity.profile.update_self
+identity.residency.submit
+identity.residency.review
+geo.registry.read
+geo.registry.propose_change
+geo.registry.approve_change
+
+board.create
+board.view_public
+board.view_internal
+board.membership.nominate
+board.membership.screen
+board.membership.approve
+board.membership.revoke
+board.conflict.declare
+board.conflict.review
+
+case.create
+case.read_own
+case.read_assigned
+case.triage
+case.assign
+case.referral.create
+case.outcome.propose
+case.outcome.verify
+case.appeal.review
+
+project.create
+project.publish
+project.funding.record
+project.funding.verify
+project.inspection.submit
+project.inspection.review
+project.completion.certify
+project.read_public
+
+meeting.create
+meeting.invite
+meeting.attendance.confirm
+meeting.vote.cast
+meeting.minutes.submit
+meeting.minutes.approve
+resolution.adopt
+resolution.publish
+resolution.amend
+
+audit.read_authorized
+system.configuration.manage
+
+
+A permission must be evaluated in relation to the correct board, jurisdiction, appointment period, legal mandate, record classification and conflicts.
+13. Functional requirements register
+Requirement IDs below should appear in engineering tickets and test cases.
+ID	Requirement	Priority
+FR-001	Register resident using verified contact	Must
+FR-002	Support secure login, recovery and MFA	Must
+FR-003	Import versioned official geographic records	Must
+FR-004	Verify residency with documented review	Must
+FR-005	Restrict changes to jurisdiction and profile authority	Must
+FR-006	Seed seven immutable board type definitions	Must
+FR-007	Create jurisdiction-specific board instances	Must
+FR-008	Nominate, screen and appoint board members	Must
+FR-009	Enforce tenure and revoke expired appointments	Must
+FR-010	Record and enforce conflict recusals	Must
+FR-011	Submit and acknowledge citizen complaints	Must
+FR-012	Route cases using jurisdiction and taxonomy	Must
+FR-013	Record updates and evidence in case history	Must
+FR-014	Support responsible-authority referral	Must
+FR-015	Verify case outcomes and handle appeals	Must
+FR-016	Register projects with original sources	Must
+FR-017	Record financial events without conflating amounts	Must
+FR-018	Version milestones and project amendments	Must
+FR-019	Conduct board monitoring and inspections	Must
+FR-020	Publish privacy-reviewed project transparency pages	Must
+FR-021	Schedule meetings and issue invitations	Must
+FR-022	Calculate charter-based quorum	Must
+FR-023	Validate votes and recusals	Must
+FR-024	Approve minutes and resolutions	Must
+FR-025	Track resolution actions	Must
+FR-026	Create complete append-only audit events	Must
+FR-027	Support accessible mobile and desktop interfaces	Must
+FR-028	Notify users of relevant actions and decisions	Must
+FR-029	Export authorized reports with redaction	Must
+FR-030	Provide privacy and data-subject request processing	Must
+FR-031	Enable offline draft completion and safe synchronization	Should
+FR-032	Support multilingual content and interface localization	Should
+FR-033	Detect duplicate public issues for review	Should
+FR-034	Support institutional integration through authenticated APIs	Should
+FR-035	Provide advanced AI-assisted classification	Later
+
+"Must" requirements are the minimum acceptance baseline for the production pilot; "Should" requirements can be staged according to pilot capacity.
+14. Non-functional requirements
+These are proposed engineering targets, not measurements of an existing implementation.
+Area	Release target
+Availability	At least 99.9% monthly availability target for production pilot
+Interactive API latency	p95 under 500 ms for standard non-search CRUD requests under validated pilot load
+General page rendering	Core pages should meet measured mobile web performance budgets
+Accessibility	WCAG 2.2 AA, independently tested
+Mobile network support	Usable on constrained 3G/4G connections
+Scalability	Horizontal service scaling and partition-ready data design
+Database integrity	ACID transactions for authoritative state changes
+Backups	Encrypted automated backups with tested restoration
+Recovery point	Initial target RPO 15 minutes for core transactional data
+Recovery time	Initial target RTO 4 hours for critical service recovery
+Audit retention	Policy-controlled, legally reviewed retention schedules
+Encryption	TLS 1.2+ in transit; modern encryption at rest
+API versioning	Explicit major version, backward compatibility policy
+Monitoring	Error, latency, job failure, authorization and suspicious activity metrics
+Localization	Unicode and locale-ready formatting
+Browser support	Current major desktop and mobile browsers
+Availability of public records	Accessible without compulsory account registration
+
+Targets must be validated in performance testing and adjusted to funded infrastructure, operational staff and service-level commitments.
+15. Data architecture
+I recommend PostgreSQL with a relational schema, PostGIS where verified geographic shapes exist, and separate object storage for evidence files.
+
+The data model should be normalized around these core domains.
+15.1 Identity and geography
+Table	Essential columns
+users	id, display_name, lifecycle_status, created_at
+auth_identities	user_id, provider, provider_subject, verified_at
+user_contacts	user_id, contact_type, encrypted_value, verified_at
+geo_units	id, type, parent_id, source_code, name, valid_from, valid_to
+geo_sources	id, institution, version, reference_url, imported_at
+communities	id, ward_id, name, verification_status
+residencies	id, user_id, community_id, status, valid_from, valid_to
+residency_evidence	id, residency_id, document_ref, reviewer_id
+role_grants	id, user_id, role_code, jurisdiction_id, valid_until
+
+15.2 Boards and appointments
+Table	Essential columns
+board_types	id, code, name, description
+boards	id, type_id, jurisdiction_id, charter_version_id, status
+board_charters	id, board_id, quorum_rule, voting_rule, effective_from
+nominations	id, board_id, candidate_id, nominator_id, status
+screening_reviews	id, nomination_id, reviewer_id, decision, evidence_ref
+appointments	id, board_id, user_id, role, start_at, end_at, status
+conflict_disclosures	id, user_id, matter_id, scope, status
+recusals	id, disclosure_id, restriction_type, decision_by
+board_tasks	id, board_id, owner_id, due_at, status
+
+15.3 Cases
+Table	Essential columns
+cases	id, reference, reporter_id, category, jurisdiction_id, status
+case_details	case_id, title, encrypted_description, sensitivity
+case_events	id, case_id, actor_id, event_type, created_at
+case_assignments	id, case_id, organization_id, assignee_id, effective_at
+case_evidence	id, case_id, file_id, classification, uploaded_by
+case_referrals	id, case_id, recipient_id, status, acknowledged_at
+case_outcomes	id, case_id, outcome, evidence_ref, reviewer_id
+case_appeals	id, case_id, appellant_id, reason, status
+
+15.4 Projects and finance
+Table	Essential columns
+projects	id, reference, sector, jurisdiction_id, status
+project_versions	id, project_id, version_no, scope, budget
+project_participants	project_id, organization_id, role
+project_funding	id, project_id, source_id, allocation_reference
+financial_events	id, project_id, type, amount, currency, evidence_ref
+project_milestones	id, project_version_id, weight, status
+project_inspections	id, project_id, inspector_id, observed_at, outcome
+project_observations	id, project_id, reporter_id, visibility
+project_disclosures	id, project_id, content_version, published_at
+
+15.5 Meetings and resolutions
+Table	Essential columns
+meetings	id, board_id, type, start_at, status
+meeting_agendas	id, meeting_id, version_no, status
+meeting_attendance	id, meeting_id, member_id, attendance_status
+motions	id, meeting_id, proposer_id, text, status
+ballots	id, motion_id, voter_id, choice, cast_at
+quorum_snapshots	id, meeting_id, eligible_count, present_count, rules_version
+meeting_minutes	id, meeting_id, version, status, approved_by
+resolutions	id, board_id, motion_id, decision, adopted_at
+resolution_actions	id, resolution_id, owner_id, status, due_at
+
+15.6 Cross-cutting records
+organizations, files, document_versions, notifications, outbox_events, access_policies, audit_events, data_subject_requests, consent_records, record_retention_rules and integration_credentials.
+
+Primary keys should use UUIDs or another collision-resistant distributed identifier. Foreign keys, uniqueness constraints, indexes and record lifecycle constraints must be enforced at the database level.
+15.7 Key database constraints
+- A user may have multiple historical residencies but only one designated current primary service community at a time.
+- A board type must be unique for an active jurisdiction, unless a charter explicitly authorizes multiple instances.
+- An appointment cannot grant permissions outside its effective dates.
+- A conflicted member cannot vote on a restricted matter.
+- A project milestone belongs to an immutable project baseline version.
+- Financial records must support signed corrections and reversals rather than silent overwrites.
+- Meeting votes must be unique per member and motion, except where a formal revote is recorded as a distinct round.
+- Case events and audit events must preserve historical order and provenance.
+15.8 Entity relationship overview
+#chatgpt-mermaid-_r_186_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;fill:rgb(13, 13, 13);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_186_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_186_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_186_ .error-icon{fill:rgb(243, 243, 243);}#chatgpt-mermaid-_r_186_ .error-text{fill:rgb(13, 13, 13);stroke:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_186_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_186_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_186_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_186_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_186_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_186_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_186_ .marker.cross{stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_186_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;}#chatgpt-mermaid-_r_186_ p{margin:0;}#chatgpt-mermaid-_r_186_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ .cluster-label text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ .cluster-label span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_186_ .label text,#chatgpt-mermaid-_r_186_ span{fill:rgb(13, 13, 13);color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ .node rect,#chatgpt-mermaid-_r_186_ .node circle,#chatgpt-mermaid-_r_186_ .node ellipse,#chatgpt-mermaid-_r_186_ .node polygon,#chatgpt-mermaid-_r_186_ .node path{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_186_ .rough-node .label text,#chatgpt-mermaid-_r_186_ .node .label text,#chatgpt-mermaid-_r_186_ .image-shape .label,#chatgpt-mermaid-_r_186_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_186_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_186_ .rough-node .label,#chatgpt-mermaid-_r_186_ .node .label,#chatgpt-mermaid-_r_186_ .image-shape .label,#chatgpt-mermaid-_r_186_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_186_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_186_ .root .anchor path{fill:rgb(143, 143, 143)!important;stroke-width:0;stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_186_ .arrowheadPath{fill:rgb(143, 143, 143);}#chatgpt-mermaid-_r_186_ .edgePath .path{stroke:rgb(143, 143, 143);stroke-width:1px;}#chatgpt-mermaid-_r_186_ .flowchart-link{stroke:rgb(143, 143, 143);fill:none;}#chatgpt-mermaid-_r_186_ .edgeLabel{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_186_ .edgeLabel p{background-color:rgb(252, 252, 252);}#chatgpt-mermaid-_r_186_ .edgeLabel rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_186_ .labelBkg{background-color:rgba(252, 252, 252, 0.5);}#chatgpt-mermaid-_r_186_ .cluster rect{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_186_ .cluster text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ .cluster span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:12px;background:rgb(243, 243, 243);border:1px solid rgba(0, 0, 0, 0.1);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_186_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_186_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_186_ .icon-shape,#chatgpt-mermaid-_r_186_ .image-shape{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_186_ .icon-shape p,#chatgpt-mermaid-_r_186_ .image-shape p{background-color:rgb(252, 252, 252);padding:2px;}#chatgpt-mermaid-_r_186_ .icon-shape .label rect,#chatgpt-mermaid-_r_186_ .image-shape .label rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_186_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_186_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_186_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_186_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_186_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_186_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_186_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_186_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_186_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_186_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_186_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_186_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-_r_186_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_186_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_186_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_186_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_186_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_186_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_186_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_186_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(65, 65, 65);}#chatgpt-mermaid-_r_186_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(65, 65, 65);}#chatgpt-mermaid-_r_186_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_186_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_186_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(252, 252, 252);stroke:rgb(219, 219, 219);stroke-width:1px;}#chatgpt-mermaid-_r_186_ .node rect,#chatgpt-mermaid-_r_186_ .node circle,#chatgpt-mermaid-_r_186_ .node ellipse,#chatgpt-mermaid-_r_186_ .node polygon,#chatgpt-mermaid-_r_186_ .node path{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_186_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_186_ .mermaid-decision .label-container{fill:rgb(249, 249, 249);stroke:rgb(219, 219, 219);stroke-dasharray:2px,2px;}#chatgpt-mermaid-_r_186_ .edgePaths .flowchart-link{stroke:rgb(143, 143, 143);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_186_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_186_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;}Geographic UnitsResidenciesUsersBoardsSeven Board TypesAppointmentsCitizen CasesCase AssignmentsPublic ProjectsFinancial EventsInspectionsMeetingsVoting EligibilityResolutionsAction Tracking
+
+
+
+
+
+This is a simplified conceptual relationship model. Engineering implementation will require a complete schema, including cardinality, indexing, foreign-key behavior, data classifications and migration definitions.
+
+Part V — Backend, APIs and operational rules
+16. Technical stack
+Layer	Specification
+Citizen web app	Next.js, React, TypeScript
+Administrative portal	Next.js, TypeScript
+Mobile application	React Native / Expo
+UI system	Accessible component library, shared design tokens
+Backend	NestJS, TypeScript
+API	REST with OpenAPI 3.1
+Authentication	OpenID Connect / OAuth 2.0-compatible provider
+Authorization	RBAC plus attribute- and jurisdiction-based policy enforcement
+Database	PostgreSQL with PostGIS
+Object storage	Private S3-compatible buckets
+Background jobs	Redis-backed queue and worker processes
+Search	PostgreSQL text search initially; dedicated search engine when needed
+Email and SMS	Configurable provider adapters
+Observability	OpenTelemetry, central logging, metrics and tracing
+Infrastructure	Containerized deployment with infrastructure-as-code
+Automated testing	Vitest/Jest, API integration tests and Playwright
+
+Do not deploy Kubernetes, multiple microservices or a separate search cluster merely for architectural sophistication. Begin with a modular backend and extract components when justified by scale, operational isolation or security needs.
+17. Backend modules
+The NestJS application should use the following boundaries:
+apps/
+  citizen-web/
+  board-portal/
+  mobile/
+  api/
+  worker/
+
+packages/
+  ui/
+  shared-types/
+  validation/
+  api-client/
+  authorization/
+  config/
+
+apps/api/src/modules/
+  identity/
+  geography/
+  residency/
+  organizations/
+  boards/
+  appointments/
+  conflicts/
+  cases/
+  referrals/
+  projects/
+  finance/
+  inspections/
+  meetings/
+  voting/
+  resolutions/
+  documents/
+  notifications/
+  audit/
+  reporting/
+  privacy/
+
+
+Each backend module should maintain clearly separated controllers, request validation, application services, authorization policies, domain models, repositories and event handlers.
+
+All database mutations must happen through authorized backend services.
+18. API endpoint specification
+The API prefix should be /api/v1.
+Identity and geography
+Method	Endpoint	Purpose
+POST	/auth/register	Begin registration
+POST	/auth/verify-contact	Verify contact challenge
+GET	/me	Read current profile
+PATCH	/me	Update permitted fields
+GET	/geo/units	List filtered geographic units
+GET	/geo/units/{id}/children	Fetch geographic children
+POST	/me/residencies	Submit residency
+GET	/me/residencies	View submitted residency records
+POST	/residency-reviews/{id}/decision	Authorized reviewer decision
+
+Authentication endpoints may be implemented or delegated to the identity provider. The backend must not create a second, insecure password system in parallel.
+Boards and appointments
+Method	Endpoint	Purpose
+GET	/board-types	Get seven principal board definitions
+GET	/boards	List authorized boards
+POST	/boards	Create board instance
+GET	/boards/{id}	Board detail
+POST	/boards/{id}/nominations	Submit nomination
+POST	/nominations/{id}/screening	Record screening
+POST	/nominations/{id}/decision	Approve/reject nomination
+GET	/boards/{id}/members	Membership list
+POST	/appointments/{id}/revoke	Revoke appointment
+POST	/conflicts	Declare conflict
+POST	/conflicts/{id}/decision	Resolve disclosure
+
+Cases
+Method	Endpoint	Purpose
+POST	/cases	Create case
+GET	/cases	List authorized cases
+GET	/cases/{id}	Case detail
+POST	/cases/{id}/events	Add controlled case update
+POST	/cases/{id}/assignments	Assign case
+POST	/cases/{id}/referrals	Create referral
+POST	/cases/{id}/evidence	Complete approved evidence attachment
+POST	/cases/{id}/outcomes	Propose outcome
+POST	/cases/{id}/outcome-review	Verify outcome
+POST	/cases/{id}/appeals	Appeal/reopen request
+
+Projects and funding
+Method	Endpoint	Purpose
+GET	/projects	Search project records
+POST	/projects	Register project
+GET	/projects/{id}	Project detail
+POST	/projects/{id}/versions	Propose amendment
+POST	/projects/{id}/funding	Record funding source
+POST	/projects/{id}/financial-events	Record financial event
+POST	/financial-events/{id}/verification	Verify supporting record
+POST	/projects/{id}/milestones	Add milestone
+POST	/projects/{id}/inspections	Record inspection
+POST	/projects/{id}/completion-review	Evaluate completion
+
+Meetings and resolutions
+Method	Endpoint	Purpose
+GET	/meetings	List authorized meetings
+POST	/meetings	Create meeting
+POST	/meetings/{id}/agenda	Submit/update agenda
+POST	/meetings/{id}/attendance	Record attendance
+GET	/meetings/{id}/quorum	Server-calculated quorum
+POST	/meetings/{id}/motions	Propose motion
+POST	/motions/{id}/votes	Cast authorized vote
+POST	/meetings/{id}/minutes	Submit minutes version
+POST	/minutes/{id}/approval	Approve minutes
+GET	/resolutions	Search resolutions
+POST	/resolutions/{id}/actions	Create follow-up action
+
+18.1 Example case-submission contract
+{
+  "category_code": "INF_WATER",
+  "title": "Community borehole not functioning",
+  "description": "The community water point has been unavailable for several days.",
+  "jurisdiction_id": "validated-ward-or-community-uuid",
+  "location": {
+    "landmark": "Community water point",
+    "coordinates": null
+  },
+  "visibility_request": "RESTRICTED",
+  "attachment_ids": [],
+  "client_request_id": "unique-client-generated-id"
+}
+
+
+The server derives the reporter identity from the authenticated session. It must not trust a client-supplied reporter_id or board assignment.
+
+Success response: HTTP 201 Created
+{
+  "id": "server-generated-uuid",
+  "reference": "CBS-2026-000142",
+  "status": "SUBMITTED",
+  "created_at": "2026-11-03T09:30:00+01:00",
+  "next_action": "INTAKE_REVIEW"
+}
+
+
+The example is illustrative, not a live API result.
+18.2 API conventions
+- Use validated schemas and strict enum values.
+- Use cursor-based pagination for large lists.
+- Support idempotency keys for sensitive submissions.
+- Use optimistic concurrency controls for versioned records.
+- Return consistent error codes and trace identifiers.
+- Apply server-side field filtering to prevent data leakage.
+- Rate-limit public submission and authentication endpoints.
+- Record authorization denials and high-risk actions.
+- Use secure, short-lived object-storage upload URLs.
+- Scan files before permitted retrieval or publication.
+- Disallow arbitrary mass assignment in request bodies.
+A representative error format:
+{
+  "error": {
+    "code": "JURISDICTION_ACCESS_DENIED",
+    "message": "You do not have permission to perform this action.",
+    "request_id": "req-example-001"
+  }
+}
+
+
+19. State machines and workflow enforcement
+The backend must enforce state transitions rather than accepting arbitrary status updates.
+19.1 Case workflow
+#chatgpt-mermaid-_r_195_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;fill:rgb(13, 13, 13);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_195_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_195_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_195_ .error-icon{fill:rgb(243, 243, 243);}#chatgpt-mermaid-_r_195_ .error-text{fill:rgb(13, 13, 13);stroke:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_195_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_195_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_195_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_195_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_195_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_195_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_195_ .marker.cross{stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_195_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;}#chatgpt-mermaid-_r_195_ p{margin:0;}#chatgpt-mermaid-_r_195_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ .cluster-label text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ .cluster-label span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_195_ .label text,#chatgpt-mermaid-_r_195_ span{fill:rgb(13, 13, 13);color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ .node rect,#chatgpt-mermaid-_r_195_ .node circle,#chatgpt-mermaid-_r_195_ .node ellipse,#chatgpt-mermaid-_r_195_ .node polygon,#chatgpt-mermaid-_r_195_ .node path{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_195_ .rough-node .label text,#chatgpt-mermaid-_r_195_ .node .label text,#chatgpt-mermaid-_r_195_ .image-shape .label,#chatgpt-mermaid-_r_195_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_195_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_195_ .rough-node .label,#chatgpt-mermaid-_r_195_ .node .label,#chatgpt-mermaid-_r_195_ .image-shape .label,#chatgpt-mermaid-_r_195_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_195_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_195_ .root .anchor path{fill:rgb(143, 143, 143)!important;stroke-width:0;stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_195_ .arrowheadPath{fill:rgb(143, 143, 143);}#chatgpt-mermaid-_r_195_ .edgePath .path{stroke:rgb(143, 143, 143);stroke-width:1px;}#chatgpt-mermaid-_r_195_ .flowchart-link{stroke:rgb(143, 143, 143);fill:none;}#chatgpt-mermaid-_r_195_ .edgeLabel{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_195_ .edgeLabel p{background-color:rgb(252, 252, 252);}#chatgpt-mermaid-_r_195_ .edgeLabel rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_195_ .labelBkg{background-color:rgba(252, 252, 252, 0.5);}#chatgpt-mermaid-_r_195_ .cluster rect{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_195_ .cluster text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ .cluster span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:12px;background:rgb(243, 243, 243);border:1px solid rgba(0, 0, 0, 0.1);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_195_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_195_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_195_ .icon-shape,#chatgpt-mermaid-_r_195_ .image-shape{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_195_ .icon-shape p,#chatgpt-mermaid-_r_195_ .image-shape p{background-color:rgb(252, 252, 252);padding:2px;}#chatgpt-mermaid-_r_195_ .icon-shape .label rect,#chatgpt-mermaid-_r_195_ .image-shape .label rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_195_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_195_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_195_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_195_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_195_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_195_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_195_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_195_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_195_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_195_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_195_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_195_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-_r_195_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_195_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_195_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_195_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_195_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_195_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_195_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_195_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(65, 65, 65);}#chatgpt-mermaid-_r_195_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(65, 65, 65);}#chatgpt-mermaid-_r_195_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_195_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_195_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(252, 252, 252);stroke:rgb(219, 219, 219);stroke-width:1px;}#chatgpt-mermaid-_r_195_ .node rect,#chatgpt-mermaid-_r_195_ .node circle,#chatgpt-mermaid-_r_195_ .node ellipse,#chatgpt-mermaid-_r_195_ .node polygon,#chatgpt-mermaid-_r_195_ .node path{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_195_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_195_ .mermaid-decision .label-container{fill:rgb(249, 249, 249);stroke:rgb(219, 219, 219);stroke-dasharray:2px,2px;}#chatgpt-mermaid-_r_195_ .edgePaths .flowchart-link{stroke:rgb(143, 143, 143);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_195_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_195_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;}DraftSubmittedIntake ReviewAcceptedNeeds InformationRejected With ReasonsAssignedIn ProgressOutcome ProposedVerificationClosedCorrection RequiredAppealAppeal outcomeAcceptedNot accepted
+
+
+
+
+
+Additional controlled transitions are needed for duplicates, external referrals, transferred jurisdiction and inappropriate or abusive submissions. These must be defined with authorization, notification and audit rules.
+19.2 Board appointment workflow
+#chatgpt-mermaid-_r_19c_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;fill:rgb(13, 13, 13);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_19c_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_19c_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_19c_ .error-icon{fill:rgb(243, 243, 243);}#chatgpt-mermaid-_r_19c_ .error-text{fill:rgb(13, 13, 13);stroke:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_19c_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_19c_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_19c_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_19c_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_19c_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_19c_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_19c_ .marker.cross{stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_19c_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;}#chatgpt-mermaid-_r_19c_ p{margin:0;}#chatgpt-mermaid-_r_19c_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ .cluster-label text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ .cluster-label span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_19c_ .label text,#chatgpt-mermaid-_r_19c_ span{fill:rgb(13, 13, 13);color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ .node rect,#chatgpt-mermaid-_r_19c_ .node circle,#chatgpt-mermaid-_r_19c_ .node ellipse,#chatgpt-mermaid-_r_19c_ .node polygon,#chatgpt-mermaid-_r_19c_ .node path{fill:rgb(222, 234, 251);stroke:rgb(83, 154, 248);stroke-width:1px;}#chatgpt-mermaid-_r_19c_ .rough-node .label text,#chatgpt-mermaid-_r_19c_ .node .label text,#chatgpt-mermaid-_r_19c_ .image-shape .label,#chatgpt-mermaid-_r_19c_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_19c_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_19c_ .rough-node .label,#chatgpt-mermaid-_r_19c_ .node .label,#chatgpt-mermaid-_r_19c_ .image-shape .label,#chatgpt-mermaid-_r_19c_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_19c_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_19c_ .root .anchor path{fill:rgb(143, 143, 143)!important;stroke-width:0;stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_19c_ .arrowheadPath{fill:rgb(143, 143, 143);}#chatgpt-mermaid-_r_19c_ .edgePath .path{stroke:rgb(143, 143, 143);stroke-width:1px;}#chatgpt-mermaid-_r_19c_ .flowchart-link{stroke:rgb(143, 143, 143);fill:none;}#chatgpt-mermaid-_r_19c_ .edgeLabel{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_19c_ .edgeLabel p{background-color:rgb(252, 252, 252);}#chatgpt-mermaid-_r_19c_ .edgeLabel rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_19c_ .labelBkg{background-color:rgba(252, 252, 252, 0.5);}#chatgpt-mermaid-_r_19c_ .cluster rect{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_19c_ .cluster text{fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ .cluster span{color:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;font-size:12px;background:rgb(243, 243, 243);border:1px solid rgba(0, 0, 0, 0.1);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_19c_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(13, 13, 13);}#chatgpt-mermaid-_r_19c_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_19c_ .icon-shape,#chatgpt-mermaid-_r_19c_ .image-shape{background-color:rgb(252, 252, 252);text-align:center;}#chatgpt-mermaid-_r_19c_ .icon-shape p,#chatgpt-mermaid-_r_19c_ .image-shape p{background-color:rgb(252, 252, 252);padding:2px;}#chatgpt-mermaid-_r_19c_ .icon-shape .label rect,#chatgpt-mermaid-_r_19c_ .image-shape .label rect{opacity:0.5;background-color:rgb(252, 252, 252);fill:rgb(252, 252, 252);}#chatgpt-mermaid-_r_19c_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_19c_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_19c_ .node .neo-node{stroke:rgb(83, 154, 248);}#chatgpt-mermaid-_r_19c_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_19c_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_19c_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_19c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_19c_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_19c_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_19c_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_19c_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_19c_ [data-look="neo"].node .neo-line path{stroke:rgb(83, 154, 248);filter:none;}#chatgpt-mermaid-_r_19c_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_19c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_19c_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_19c_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_19c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_19c_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_19c_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_19c_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(65, 65, 65);}#chatgpt-mermaid-_r_19c_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(65, 65, 65);}#chatgpt-mermaid-_r_19c_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_19c_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_19c_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(252, 252, 252);stroke:rgb(219, 219, 219);stroke-width:1px;}#chatgpt-mermaid-_r_19c_ .node rect,#chatgpt-mermaid-_r_19c_ .node circle,#chatgpt-mermaid-_r_19c_ .node ellipse,#chatgpt-mermaid-_r_19c_ .node polygon,#chatgpt-mermaid-_r_19c_ .node path{fill:rgb(243, 243, 243);stroke:rgba(0, 0, 0, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_19c_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_19c_ .mermaid-decision .label-container{fill:rgb(249, 249, 249);stroke:rgb(219, 219, 219);stroke-dasharray:2px,2px;}#chatgpt-mermaid-_r_19c_ .edgePaths .flowchart-link{stroke:rgb(143, 143, 143);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_19c_ .marker{fill:rgb(143, 143, 143);stroke:rgb(143, 143, 143);}#chatgpt-mermaid-_r_19c_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;}NominationCandidate AcceptanceEligibility ScreeningEligible?Rejected With ReasonsAuthority ReviewApproved?Appointment CreatedActive ServiceExpired / Resigned / RevokedNoYesNoYes
+
+
+
+
+
+19.3 Project lifecycle
+Identified → Source Review → Registered → Planning → Procurement/Contracting (where applicable) → Implementation → Completion Reported → Technical Verification → Handover → Closed / Monitoring
+
+Transitions should allow cancellation, suspension, dispute and approved re-baselining.
+19.4 Meeting lifecycle
+Draft → Scheduled → Notice Issued → Convened → Quorum Verified → Deliberation → Decision Recorded → Minutes Review → Minutes Approved → Archived
+
+A meeting without quorum may record discussion but must not produce a purportedly valid formal decision when quorum is legally or procedurally required.
+20. Events and notification engine
+Use domain events to decouple business transactions from notifications.
+
+Example events:
+user.contact_verified
+residency.review_requested
+board.appointment_approved
+board.appointment_revoked
+board.conflict_recorded
+case.submitted
+case.assigned
+case.referral_acknowledged
+case.outcome_proposed
+case.appeal_created
+project.funding_disclosed
+project.inspection_submitted
+project.milestone_overdue
+meeting.scheduled
+meeting.quorum_confirmed
+resolution.adopted
+resolution.action_overdue
+
+
+Notifications should use an outbox pattern so that committed database changes reliably generate downstream work.
+
+Each notification needs an audience, purpose, delivery preference, privacy classification and delivery status. External SMS and email should never reveal confidential case narratives or sensitive personal information.
+
+For example:
+Your CBS case has been updated. Sign in securely to view the details.
+
+That is safer than transmitting allegations, witness identities or restricted attachments through SMS.
+
+Part VI — Security, governance, compliance and quality assurance
+21. Security architecture
+The platform will contain potentially sensitive personal, financial and governance information. Security should therefore be implemented as a mandatory system-wide requirement.
+21.1 Data classifications
+Classification	Examples	Access rule
+Public	Published board directory, approved resolutions, public project disclosures	Available without login
+Internal	Board tasks, unpublished minutes, internal work queues	Authorized members only
+Confidential	Complaints, resident verification documents, protected correspondence	Assigned authorized personnel
+Highly restricted	Safety incidents, protected witness information, sensitive allegations	Explicitly approved case handlers
+Security administration	Credentials, security logs, encryption operations	Segregated technical security roles
+
+Critical principle: A system administrator should not automatically have authority to read confidential case content simply because they manage the application's infrastructure.
+
+Sensitive records should have field-level or application-level encryption where appropriate, with carefully managed keys and privileged access procedures.
+21.2 Security controls
+Implement:
+- Strong authentication and MFA for privileged users.
+- Short-lived sessions and refresh-token rotation.
+- Privileged session revocation when appointments expire.
+- Jurisdiction-aware authorization on every protected request.
+- File scanning, MIME validation and size restrictions.
+- Protection against SQL injection, XSS, CSRF, SSRF and insecure direct-object references.
+- Secure password and recovery policies where local authentication exists.
+- Sensitive data redaction in logs and telemetry.
+- Tamper-evident, append-only audit logs.
+- Backups with protected storage and tested recovery.
+- Security alerts for unusual account activity and bulk data access.
+- Periodic independent penetration testing.
+- Formal breach response and incident escalation procedures.
+21.3 Nigerian legal and data-protection safeguards
+The legal implementation plan must account for the Nigeria Data Protection Act 2023 and relevant Nigeria Data Protection Commission guidance, including lawful processing, privacy notices, data protection impact assessments, organizational accountability and cross-border transfer requirements. 
+National Drug Policy Committee
+
+
+The governance framework must also recognize local-government constitutional arrangements and the implications of the July 11, 2024 Supreme Court judgment on local-government financial autonomy. 
+Federal Ministry of Info
+
+
+Before launch, legal counsel should approve the board charter, institutional agreements, privacy documentation, authorized case-handling model, disclosure rules and retention schedule.
+21.4 Special safeguards for the Security Board
+The Board of Security and Intelligence Gathering remains one of the seven principal boards, but it requires tighter protections than ordinary service boards.
+
+For Version 1:
+- Permit confidential safety reports and authorized referrals.
+- Do not expose a public map of identifiable security complaints.
+- Do not enable community-wide tracking of people's movements.
+- Do not produce automated criminal suspicion scores.
+- Do not enable warrantless searches, arrests or detention orders.
+- Do not disclose reporter identity to ordinary board members.
+- Do not allow accusations to be publicly published without appropriate review.
+- Provide emergency-service guidance without claiming the platform is a 24/7 dispatch service.
+All law-enforcement and emergency-response integrations require institutional approval, authenticated endpoints and tested operating procedures.
+22. Quality assurance and acceptance tests
+Developers must produce automated unit, integration, API authorization, end-to-end, accessibility and security tests.
+22.1 Mandatory acceptance scenarios
+Test ID	Test scenario	Expected result
+QA-001	Resident registers and verifies phone	Account created once; verification recorded
+QA-002	User selects wrong LGA	Error and correction path provided
+QA-003	User attempts to impersonate a board member	Privileged access denied
+QA-004	Appointment expires	Privileged access revoked
+QA-005	Member attempts self-approval	Approval denied
+QA-006	Conflicted member attempts vote	Vote rejected
+QA-007	Resident submits case twice after network retry	Idempotency prevents duplicate creation
+QA-008	Officer requests case outside jurisdiction	Access denied and logged
+QA-009	Officer attempts unauthorized case closure	Request rejected
+QA-010	Resident challenges case closure	Appeal record created
+QA-011	Funding event lacks verified source	Remains unverified
+QA-012	Milestone budget or scope is amended	New version recorded
+QA-013	Project lacks verified coordinates	Map does not fabricate position
+QA-014	Meeting lacks quorum	Formal decision blocked
+QA-015	Minutes are approved	Approved version locked
+QA-016	User attempts to view another resident's restricted case	Access denied
+QA-017	Public export requested	Confidential fields excluded
+QA-018	Backup restored in test environment	Integrity validated
+QA-019	Mobile network disconnects during a draft	Draft recoverable without false submission
+QA-020	Administrator attempts silent historical deletion	Operation denied or preserved as an auditable action
+
+22.2 End-to-end demonstration
+The final pilot must demonstrate this complete sequence:
+Resident onboarding and verified community assignment
+
+
+Functional board establishment and member appointment
+
+
+Complaint submitted, assigned and investigated
+
+
+Project registered with funding evidence
+
+
+Board meeting conducted and quorum verified
+
+
+Resolution adopted and resulting action tracked
+
+
+Citizen receives outcome and can appeal
+
+These are required demonstration capabilities, not claims that the application has already been built.
+23. Deployment and infrastructure
+I recommend using separate development, staging and production environments.
+
+A typical pilot infrastructure should contain:
+- Secure CDN and web application firewall.
+- Next.js web hosting.
+- Containerized NestJS API.
+- Background worker deployment.
+- Managed PostgreSQL with backups.
+- Private document storage.
+- Managed Redis.
+- Identity provider.
+- Central secrets and key-management service.
+- Monitoring, tracing and audit infrastructure.
+Production data should never be copied into development without approved de-identification.
+23.1 CI/CD requirements
+Every pull request should pass:
+1. Code formatting and linting.
+2. Type checks.
+3. Unit tests.
+4. API contract tests.
+5. Dependency and secret scans.
+6. Static security analysis.
+7. Database migration checks.
+8. End-to-end tests for critical workflows.
+9. Authorized review before production deployment.
+Database migrations must have rollback or forward-recovery procedures.
+23.2 Operational monitoring
+Operational dashboards should monitor API latency, error rates, authentication failures, background queue delays, notification delivery, database health, storage utilization, audit-log integrity and backup completion.
+
+Application operators should have an incident-response runbook, documented on-call responsibilities and tested restoration procedures before public launch.
+24. Suggested software delivery stages
+
+Stage A — Design and governance approval
+
+Finalize design tokens, all screen wireframes, user journeys, board charter rules, authorization matrix, privacy requirements and pilot jurisdictions.
+
+
+
+
+Stage B — Core platform construction
+
+Build identity, geography, role management, database schema, organization registry, boards, nominations and appointment workflows.
+
+
+
+
+Stage C — Operational workflows
+
+Build reporting, case triage, referrals, project registration, funding evidence, inspections, meetings and resolutions.
+
+
+
+
+Stage D — Assurance and pilot
+
+Complete security tests, accessibility review, legal sign-off, performance testing, onboarding documentation, training and controlled production pilot.
+
+
+
+
+Stage E — Evaluation and scale-up
+
+Analyze verified user adoption, service response, security performance, project-disclosure quality, governance compliance and pilot feedback before wider deployment.
+
+
+
+Do not launch the entire national structure simultaneously. Begin with willing pilot communities and boards whose members, public-service counterparts and administrative staff can be trained and supported.
+
+Part VII — Final development contract
+25. Deliverables required from the development team
+The implementation team should provide the following, with working source code and documentation.
+Deliverable	Acceptance standard
+UI/UX design file	All screens and key interaction states represented
+Web application	Responsive production-ready citizen and board interfaces
+Mobile application	Android and iOS app builds, or an approved staged mobile rollout
+Backend API	Documented, tested OpenAPI contract
+Database schema	Migrations, indexes, constraints and seed scripts
+Geography import	Versioned and source-documented
+Seven-board configuration	All seven definitions and jurisdictional instances
+Authorization engine	Automated tests for roles and jurisdictions
+Cases and projects	Complete audited workflows
+Meetings and resolutions	Tested quorum, voting and approval logic
+Admin portal	Membership, configuration, monitoring and review
+Security documentation	Threat model, tests and incident-response procedures
+Deployment scripts	Reproducible staging and production provisioning
+Technical manuals	Developer setup, operations and maintenance
+User manuals	Resident, board officer, agency and administrator guidance
+
+26. Matters requiring formal governance decisions
+These are not yet resolved by the uploaded document and should not be invented by the codebase.
+Decision	Proposed approach
+Official legal operator	Identify and document the responsible registered legal entity
+Appointment authority	Adopt an explicit authority matrix
+Member tenure	Define in charter; keep software configurable
+Board membership size	Approve per board type and jurisdiction
+Voting thresholds	Charter-controlled rather than hardcoded
+Quorum	Charter-controlled and effective-dated
+Agency participation	Formal agreements and limited roles
+Funding-disclosure authority	Distinguish official data, third-party sources and public submissions
+Personal data controller	Identify responsible legal entity and processor relationships
+Retention and deletion	Adopt legally reviewed data schedules
+Public project certification	Require appropriate technical and institutional authority
+Official status of boards	Do not assert statutory status before lawful establishment
+
+27. Recommended build sequence for Codex
+For actual construction, the work should be divided into controlled engineering milestones.
+1. Repository foundation: Monorepo, TypeScript, design system, testing tools, CI/CD and secure configuration.
+2. Identity and geography: Authentication, profiles, residency verification, hierarchical jurisdiction registry and policies.
+3. Board administration: Seven boards, nominations, appointments, committees, conflicts and tenure management.
+4. Citizen cases: Reporting interface, triage, evidence, case timeline, referrals, outcome verification and appeals.
+5. Project oversight: Project registry, source documents, financial events, milestones, inspections and transparency portal.
+6. Meetings and resolutions: Scheduling, attendance, quorum, voting, minutes, resolutions and follow-up actions.
+7. Cross-cutting assurance: Notifications, audit logging, reporting, privacy operations and security testing.
+8. Pilot readiness: Deployment, sample data, staff training, operational documentation and end-to-end acceptance tests.
+Each milestone should include migrations, API documentation, functional interfaces, tests and operational documentation. Avoid producing disconnected mockups or frontend components that are not connected to properly authorized backend workflows.
+28. Strategic conclusion
+The Community Board System should be built as an institutional-grade grassroots governance application, with the citizen as the primary beneficiary and the community board as the accountable coordination mechanism.
+
+The first version must do five things exceptionally well: know which community a resident belongs to, establish legitimate community board membership, process complaints fairly, make development spending and progress traceable, and record transparent board decisions.
+
+These functions create the foundation for the later integration of security early-warning systems, socioeconomic programmes, development analytics and broader national coordination.
+
+The next logical engineering deliverable is a Codex-ready implementation package, organized into executable build instructions, complete database migrations, API schemas, frontend screen definitions, role policies and automated test requirements. It should be generated directly from this specification, preserving its safeguards and avoiding unnecessary changes to the agreed five-module priority.
+
+That will allow software development to proceed systematically rather than relying on a single oversized prompt that could omit important business rules or security controls.

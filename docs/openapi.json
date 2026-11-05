@@ -1,0 +1,2306 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CBS Workflow API",
+    "version": "0.1.0",
+    "description": "Appwrite-backed modular workflow API. Synthetic mode is local-only. Officer commands require verified contact, MFA, scoped authority, and effective appointments."
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "AppwriteJWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Appwrite JWT"
+      }
+    }
+  },
+  "paths": {
+    "/config": {
+      "get": {
+        "summary": "Public runtime configuration; contains no secrets",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/workspace": {
+      "get": {
+        "summary": "Authorized workspace projection and record-derived counts",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/evidence": {
+      "post": {
+        "summary": "Upload a private PNG/JPEG/PDF (maximum 4 MiB), always quarantined until an actual clean scan",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "targetType",
+                  "targetId",
+                  "filename",
+                  "mime",
+                  "contentBase64",
+                  "clientRequestId"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "targetType": {
+                    "enum": [
+                      "CASE",
+                      "PROJECT"
+                    ]
+                  },
+                  "targetId": {
+                    "type": "string"
+                  },
+                  "filename": {
+                    "type": "string",
+                    "maxLength": 180
+                  },
+                  "mime": {
+                    "enum": [
+                      "image/png",
+                      "image/jpeg",
+                      "application/pdf"
+                    ]
+                  },
+                  "contentBase64": {
+                    "type": "string",
+                    "contentEncoding": "base64"
+                  },
+                  "clientRequestId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          },
+          "403": {
+            "description": "Parent-record access denied"
+          },
+          "413": {
+            "description": "File too large"
+          }
+        }
+      }
+    },
+    "/evidence/{id}/scan": {
+      "post": {
+        "summary": "Retry server-side scanning of authorized stored evidence",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "403": {
+            "description": "Access denied"
+          }
+        }
+      }
+    },
+    "/evidence/{id}/download-token": {
+      "post": {
+        "summary": "Issue a 60-second account-bound download token only for clean evidence",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "423": {
+            "description": "Quarantined, rejected or not released"
+          }
+        }
+      }
+    },
+    "/evidence/{id}/download": {
+      "get": {
+        "summary": "Recheck authorization, token and byte integrity; return a private attachment",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary attachment"
+          },
+          "403": {
+            "description": "Invalid/expired token or access denied"
+          },
+          "423": {
+            "description": "Evidence not released"
+          }
+        }
+      }
+    },
+    "/commands": {
+      "post": {
+        "summary": "Execute one validated and audited workflow command atomically",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "profile"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 150
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "residency"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "jurisdiction": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "method": {
+                            "type": "string",
+                            "enum": [
+                              "COMMUNITY_ATTESTATION",
+                              "MANUAL_REVIEW",
+                              "ADDRESS_RECORD"
+                            ]
+                          },
+                          "statement": {
+                            "type": "string",
+                            "minLength": 20,
+                            "maxLength": 2000
+                          }
+                        },
+                        "required": [
+                          "jurisdiction",
+                          "method",
+                          "statement"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "reviewResidency"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "approved": {
+                            "type": "boolean"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "approved",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "createBoard"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "enum": [
+                              "EDU",
+                              "HLT",
+                              "SEC",
+                              "INF",
+                              "TRD",
+                              "YTH",
+                              "CUL"
+                            ]
+                          },
+                          "jurisdiction": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "authority": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 160
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "jurisdiction",
+                          "authority",
+                          "name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "boardStatus"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "SUBMITTED",
+                              "UNDER_REVIEW",
+                              "APPROVED",
+                              "ACTIVE",
+                              "SUSPENDED",
+                              "ARCHIVED"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "charter"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "version": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1000
+                          },
+                          "authority": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          },
+                          "capacity": {
+                            "type": "integer",
+                            "minimum": 3,
+                            "maximum": 50
+                          },
+                          "quorumPercent": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                          },
+                          "yesPercent": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                          },
+                          "termMonths": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 120
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "version",
+                          "authority",
+                          "capacity",
+                          "quorumPercent",
+                          "yesPercent",
+                          "termMonths"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "nominate"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "boardId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "candidateId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "position": {
+                            "type": "string",
+                            "enum": [
+                              "BOARD_MEMBER",
+                              "BOARD_SECRETARY",
+                              "BOARD_CHAIR"
+                            ]
+                          },
+                          "category": {
+                            "type": "string",
+                            "minLength": 3,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "boardId",
+                          "candidateId",
+                          "position",
+                          "category"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "acceptNomination"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "screenNomination"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "eligible": {
+                            "type": "boolean"
+                          },
+                          "note": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "eligible",
+                          "note"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "approveNomination"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "approved": {
+                            "type": "boolean"
+                          },
+                          "document": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "approved",
+                          "document"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "revokeAppointment"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "conflict"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "boardId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "matterId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "description": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "boardId",
+                          "matterId",
+                          "description"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "reviewConflict"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "restrict": {
+                            "type": "boolean"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "restrict",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "submitCase"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "EDU",
+                              "HLT",
+                              "SEC",
+                              "INF",
+                              "TRD",
+                              "YTH",
+                              "CUL",
+                              "GENERAL",
+                              "CONDUCT"
+                            ]
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 160
+                          },
+                          "description": {
+                            "type": "string",
+                            "minLength": 20,
+                            "maxLength": 10000
+                          },
+                          "jurisdiction": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "location": {
+                            "type": "string",
+                            "minLength": 0,
+                            "maxLength": 500
+                          },
+                          "urgency": {
+                            "type": "string",
+                            "enum": [
+                              "NORMAL",
+                              "HIGH",
+                              "URGENT"
+                            ]
+                          },
+                          "clientRequestId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          }
+                        },
+                        "required": [
+                          "category",
+                          "title",
+                          "description",
+                          "jurisdiction",
+                          "location",
+                          "urgency",
+                          "clientRequestId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "caseTransition"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "INTAKE_REVIEW",
+                              "NEEDS_INFORMATION",
+                              "ACCEPTED",
+                              "ASSIGNED",
+                              "IN_PROGRESS",
+                              "REFERRED",
+                              "OUTCOME_PROPOSED",
+                              "VERIFICATION",
+                              "CLOSED",
+                              "APPEALED",
+                              "REOPENED",
+                              "REJECTED_WITH_REASONS",
+                              "DUPLICATE_LINKED"
+                            ]
+                          },
+                          "note": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 5000
+                          },
+                          "evidence": {
+                            "default": "",
+                            "type": "string",
+                            "minLength": 0,
+                            "maxLength": 1000
+                          },
+                          "duplicateId": {
+                            "default": "",
+                            "type": "string",
+                            "minLength": 0,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "note",
+                          "evidence",
+                          "duplicateId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "assignCase"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "boardId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "assigneeId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "boardId",
+                          "assigneeId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "caseNote"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "note": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 5000
+                          },
+                          "internal": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "note",
+                          "internal"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "createProject"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 200
+                          },
+                          "description": {
+                            "type": "string",
+                            "minLength": 20,
+                            "maxLength": 5000
+                          },
+                          "jurisdiction": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "boardCode": {
+                            "type": "string",
+                            "enum": [
+                              "EDU",
+                              "HLT",
+                              "SEC",
+                              "INF",
+                              "TRD",
+                              "YTH",
+                              "CUL"
+                            ]
+                          },
+                          "authority": {
+                            "type": "string",
+                            "minLength": 3,
+                            "maxLength": 1000
+                          },
+                          "reference": {
+                            "type": "string",
+                            "minLength": 3,
+                            "maxLength": 100
+                          },
+                          "source": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          },
+                          "fiscalYear": {
+                            "type": "integer",
+                            "minimum": 2000,
+                            "maximum": 2100
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "description",
+                          "jurisdiction",
+                          "boardCode",
+                          "authority",
+                          "reference",
+                          "source",
+                          "fiscalYear"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "publishProject"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "projectStatus"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PLANNING",
+                              "CONTRACTING",
+                              "IMPLEMENTATION",
+                              "COMPLETION_REPORTED",
+                              "TECHNICAL_VERIFICATION",
+                              "SUSPENDED",
+                              "CANCELLED",
+                              "DISPUTED"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "finance"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "projectId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "APPROPRIATED",
+                              "APPROVED",
+                              "RELEASED",
+                              "DISBURSED",
+                              "COMMITTED",
+                              "PAID",
+                              "SPENT",
+                              "REFUNDED",
+                              "ADJUSTED"
+                            ]
+                          },
+                          "amount": {
+                            "type": "string",
+                            "pattern": "^(0|[1-9]\\d{0,14})\\.\\d{2}$"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "enum": [
+                              "NGN",
+                              "USD",
+                              "GBP",
+                              "EUR"
+                            ]
+                          },
+                          "fiscalYear": {
+                            "type": "integer",
+                            "minimum": 2000,
+                            "maximum": 2100
+                          },
+                          "source": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          },
+                          "evidence": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "projectId",
+                          "type",
+                          "amount",
+                          "currency",
+                          "fiscalYear",
+                          "source",
+                          "evidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "verifyFinance"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "verification": {
+                            "type": "string",
+                            "enum": [
+                              "VERIFIED",
+                              "DISPUTED",
+                              "RETRACTED"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "verification",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "acknowledgeFinance"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "side": {
+                            "type": "string",
+                            "enum": [
+                              "AUTHORITY",
+                              "BOARD"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "side"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "milestones"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          },
+                          "milestones": {
+                            "minItems": 1,
+                            "maxItems": 20,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "title": {
+                                  "type": "string",
+                                  "minLength": 3,
+                                  "maxLength": 1000
+                                },
+                                "dueAt": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                                },
+                                "weight": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 100
+                                },
+                                "acceptance": {
+                                  "type": "string",
+                                  "minLength": 5,
+                                  "maxLength": 1000
+                                },
+                                "reported": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 100
+                                }
+                              },
+                              "required": [
+                                "title",
+                                "dueAt",
+                                "weight",
+                                "acceptance",
+                                "reported"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "reason",
+                          "milestones"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "inspection"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "method": {
+                            "type": "string",
+                            "enum": [
+                              "SITE_VISIT",
+                              "DOCUMENT_REVIEW"
+                            ]
+                          },
+                          "observedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                          },
+                          "note": {
+                            "type": "string",
+                            "minLength": 20,
+                            "maxLength": 5000
+                          },
+                          "evidence": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "method",
+                          "observedAt",
+                          "note",
+                          "evidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "verifyMilestone"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "milestoneId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "verified": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 100
+                          },
+                          "evidence": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "milestoneId",
+                          "verified",
+                          "evidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "completion"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "official": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          },
+                          "community": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          },
+                          "evidence": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "official",
+                          "community",
+                          "evidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "createMeeting"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "boardId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 200
+                          },
+                          "startsAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                          },
+                          "timezone": {
+                            "type": "string",
+                            "enum": [
+                              "Africa/Lagos",
+                              "UTC"
+                            ]
+                          },
+                          "venue": {
+                            "type": "string",
+                            "minLength": 3,
+                            "maxLength": 1000
+                          },
+                          "agenda": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 5000
+                          },
+                          "visibility": {
+                            "type": "string",
+                            "enum": [
+                              "PUBLIC",
+                              "INTERNAL"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "boardId",
+                          "title",
+                          "startsAt",
+                          "timezone",
+                          "venue",
+                          "agenda",
+                          "visibility"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "attendance"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "userId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "present": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "userId",
+                          "present"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "motion"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "text": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 5000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "text"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "vote"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "motionId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "choice": {
+                            "type": "string",
+                            "enum": [
+                              "YES",
+                              "NO",
+                              "ABSTAIN"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "motionId",
+                          "choice"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "decideMotion"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "motionId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "motionId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "minutes"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "text": {
+                            "type": "string",
+                            "minLength": 20,
+                            "maxLength": 10000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "text"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "approveMinutes"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "adoptResolution"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "motionId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 200
+                          },
+                          "text": {
+                            "type": "string",
+                            "minLength": 20,
+                            "maxLength": 5000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "motionId",
+                          "title",
+                          "text"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "publishResolution"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "task"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "boardId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "resolutionId": {
+                            "default": "",
+                            "type": "string",
+                            "minLength": 0,
+                            "maxLength": 100
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 200
+                          },
+                          "ownerId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "dueAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                          }
+                        },
+                        "required": [
+                          "boardId",
+                          "resolutionId",
+                          "title",
+                          "ownerId",
+                          "dueAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "completeTask"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "evidence": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "evidence"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "reviewTaskCompletion"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "revision": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "decision": {
+                            "type": "string",
+                            "enum": [
+                              "APPROVED",
+                              "CORRECTIONS_REQUESTED"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "revision",
+                          "decision",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "privacy"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "ACCESS",
+                              "CORRECTION",
+                              "DELETION",
+                              "RESTRICTION",
+                              "JURISDICTION_CHANGE"
+                            ]
+                          },
+                          "description": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 2000
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "description"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "reviewPrivacy"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "response": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 2000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "response"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "readNotification"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "tourProgress"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "tourId": {
+                            "type": "string",
+                            "enum": [
+                              "resident",
+                              "officer"
+                            ]
+                          },
+                          "action": {
+                            "type": "string",
+                            "enum": [
+                              "START",
+                              "NEXT",
+                              "BACK",
+                              "DISMISS",
+                              "RESTART",
+                              "COMPLETE"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "tourId",
+                          "action"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "caseDeadline"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "dueAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "dueAt",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "action",
+                      "payload"
+                    ],
+                    "properties": {
+                      "action": {
+                        "const": "taskDeadline"
+                      },
+                      "payload": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "dueAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 1000
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "dueAt",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed result containing the entity id"
+          },
+          "400": {
+            "description": "Validation or invalid transition"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Role, MFA, jurisdiction, separation-of-duties or recusal restriction"
+          },
+          "409": {
+            "description": "Concurrent update; refetch and retry"
+          }
+        }
+      }
+    },
+    "/session": {
+      "post": {
+        "summary": "Synchronize a verified Appwrite identity; grants no privileged role",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/export": {
+      "get": {
+        "summary": "Download authorized project and resolution projections with metric definitions",
+        "security": [
+          {
+            "AppwriteJWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "summary": "Revoke local synthetic session; Appwrite session deletion is delegated to the SDK",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/demo-session": {
+      "post": {
+        "summary": "Local synthetic mode ONLY: select a synthetic test actor",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "404": {
+            "description": "Unavailable in Appwrite/production mode"
+          }
+        }
+      }
+    }
+  }
+}

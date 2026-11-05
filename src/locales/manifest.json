@@ -1,0 +1,5 @@
+{
+  "defaultLocale":"en",
+  "available":[{"code":"en","name":"English","status":"source"}],
+  "planned":[{"code":"ha","name":"Hausa","status":"human-review-required"},{"code":"yo","name":"Yoruba","status":"human-review-required"},{"code":"ig","name":"Igbo","status":"human-review-required"}]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "community-board-system",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "node --import tsx --watch server/index.ts",
+    "start": "node --import tsx server/index.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "node --import tsx scripts/help.ts sync && tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --import tsx --test tests/domain.test.ts tests/store.test.ts tests/api.test.ts tests/help.test.ts tests/additions.test.ts",
+    "test:e2e": "playwright test",
+    "db:migrate": "node --import tsx scripts/database.ts migrate",
+    "db:seed": "node --import tsx scripts/database.ts seed",
+    "admin:grant": "node --import tsx scripts/grant.ts",
+    "geo:import": "node --import tsx scripts/import-geography.ts",
+    "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters && node scripts/check.mjs && node --import tsx scripts/help.ts check",
+    "help:sync": "node --import tsx scripts/help.ts sync",
+    "help:check": "node --import tsx scripts/help.ts check",
+    "api:generate": "node --import tsx scripts/openapi.ts",
+    "mobile:setup": "node scripts/mobile-setup.mjs",
+    "reminders:run": "node --import tsx scripts/reminders.ts"
+  },
+  "dependencies": {
+    "appwrite": "^29.2.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  }
+}
