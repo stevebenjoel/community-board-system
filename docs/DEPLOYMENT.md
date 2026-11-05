@@ -1,6 +1,6 @@
 # Coolify deployment
 
-No hosting or domain connection has been made. This guide prepares the deployment without requiring those details now.
+Deployed on Coolify (Diplomat server) as a Docker Compose application at https://communityboardsystem.org and https://www.communityboardsystem.org, from branch `codex/setup-workspace`.
 
 ## Application resource
 
@@ -20,6 +20,12 @@ Use the Git repository and branch containing this code, Dockerfile build pack, r
 | APPWRITE_DATABASE_ID | cbs, or chosen database ID |
 | APPWRITE_API_KEY | Separate runtime key with rows.read, rows.write, files.read, files.write |
 | APPWRITE_DATA_KEY | Secret base64-encoded 32-byte AES key |
+| APPWRITE_EVIDENCE_BUCKET_ID | cbs_evidence, or chosen bucket ID |
+| CBS_CLAMAV_HOST | clamav (the compose service) |
+| CBS_CLAMAV_PORT | 3310 |
+| CBS_REMINDER_INTERVAL_MS | 900000 (minimum 60000) |
+
+Every name in `.env.local` also exists in Coolify with its production value. `compose.yaml` fixes NODE_ENV, CBS_MODE, HOST, PORT and CBS_CLAMAV_PORT, so their Coolify copies are a record only. Dev-only exceptions, not set in Coolify: CBS_DB_PATH (synthetic mode only). APPWRITE_PROVISIONING_KEY is supplied only in the operator shell for migrations and seeds, never in Coolify or `.env.local`.
 
 Configuration is read at runtime. Endpoint/project ID are returned by `/api/v1/config`; secrets never are. A changed data key cannot decrypt old records. Use a staged key-rotation migration, never replace it casually.
 
