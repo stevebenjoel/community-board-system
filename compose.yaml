@@ -2,8 +2,9 @@ services:
   cbs:
     build: .
     restart: unless-stopped
-    ports:
-      - "8080:8080"
+    # Coolify's proxy routes the domain to this port; don't bind it on the host.
+    expose:
+      - "8080"
     environment:
       NODE_ENV: production
       CBS_MODE: appwrite
