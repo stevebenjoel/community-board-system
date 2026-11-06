@@ -8,6 +8,7 @@ services:
     environment:
       NODE_ENV: production
       CBS_MODE: appwrite
+      CBS_TESTING_MODE: ${CBS_TESTING_MODE:-true}
       HOST: 0.0.0.0
       PORT: 8080
       APP_ORIGIN: ${APP_ORIGIN:?Set actual application origin}

@@ -1,6 +1,6 @@
 import { Account, Client, ID, AuthenticationFactor, AuthenticatorType } from 'appwrite';
 import type { Workspace } from '../../shared/model';
-export interface RuntimeConfig { mode:'synthetic'|'appwrite'; appwriteEndpoint:string; appwriteProjectId:string }
+export interface RuntimeConfig { mode:'synthetic'|'appwrite'; testingMode:boolean; appwriteEndpoint:string; appwriteProjectId:string }
 let settings:RuntimeConfig;
 let account:Account|null=null;
 export async function initApi(){settings=await request<RuntimeConfig>('/config');if(settings.mode==='appwrite')account=new Account(new Client().setEndpoint(settings.appwriteEndpoint).setProject(settings.appwriteProjectId));return settings;}
@@ -27,6 +27,7 @@ export async function register(name:string,email:string,password:string){
   await account.create({userId:ID.unique(),email,password,name});
   await account.createEmailPasswordSession({email,password});
   await request('/session',{});
+  if(settings.testingMode)return {verificationSent:true};
   try{await sendVerification();return {verificationSent:true};}
   catch{return {verificationSent:false};}
 }

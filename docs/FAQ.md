@@ -4,6 +4,10 @@ Reviewed 2026-11-04. Generated from src/content/help.ts. Edit the shared source,
 
 ## Start here: how CBS works
 
+### Can I test before email and two-factor authentication are configured?
+
+Yes. While testing mode is active, creating an account continues directly to community membership without a verification email or a two-factor prompt. Existing accounts can sign in with email and password. Community requests still need coordinator approval, and officer permissions still require an assigned role.
+
 ### How do I find a board from Overview?
 
 Choose its labeled card in the board directory. Each board has a distinct icon and color, and the board name identifies it.
@@ -66,7 +70,7 @@ GRID3 coverage varies and some settlement records could not be linked to a uniqu
 
 ### Does registration immediately make me a verified community member?
 
-First verify your email. Next select your community and submit a residency statement or attestation reference. A different authorized coordinator reviews the request. Verification history shows the pending, verified or rejected decision and its reason.
+Select your community and submit a residency statement or attestation reference. A different authorized coordinator reviews the request. Verification history shows the pending, verified or rejected decision and its reason. Email verification is required when temporary testing mode is off.
 
 ### Must I supply a national identity number or voter details?
 

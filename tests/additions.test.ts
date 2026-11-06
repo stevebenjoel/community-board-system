@@ -6,8 +6,29 @@ import { execute,workspace } from '../server/domain.ts';
 import { EvidenceService,MAX_EVIDENCE_BYTES,validateFile,type EvidenceStorage,type Scanner } from '../server/evidence.ts';
 import { actionItems,phaseFor,produceReminders } from '../server/reminders.ts';
 import { SqliteStore } from '../server/store.ts';
+import { config } from '../server/config.ts';
+import { has } from '../server/policy.ts';
 import { demoIds as ids,syntheticPrincipal,syntheticSeed } from '../server/seed.ts';
 const actor=(key:keyof typeof ids)=>syntheticPrincipal(syntheticSeed().users.find(u=>u.id===ids[key])!);
+test('temporary testing mode bypasses contact and MFA checks while preserving role checks and actual verification state',()=>{
+  const previous=config.CBS_TESTING_MODE;
+  const state=syntheticSeed();
+  const principal={...actor('resident'),verified:false,mfa:false};
+  const coordinator={...actor('coordinator'),verified:false,mfa:false};
+  const payload={jurisdiction:ids.community,method:'COMMUNITY_ATTESTATION',statement:'Community attestation for the temporary testing period.'};
+  try{
+    config.CBS_TESTING_MODE=false;
+    assert.throws(()=>execute(state,principal,'residency',payload),/Verify your email/);
+    assert.equal(has(state,coordinator,['LGA_COORDINATOR'],ids.community),false);
+    config.CBS_TESTING_MODE=true;
+    assert.equal(has(state,coordinator,['LGA_COORDINATOR'],ids.community),true);
+    assert.equal(has(state,principal,['LGA_COORDINATOR'],ids.community),false);
+    execute(state,principal,'residency',payload);
+    assert.equal(principal.verified,false);
+    config.CBS_TESTING_MODE=false;
+    assert.equal(has(state,coordinator,['LGA_COORDINATOR'],ids.community),false);
+  }finally{config.CBS_TESTING_MODE=previous;}
+});
 test('real community membership requires verified contact and remains pending until an independent review',()=>{
   const state=syntheticSeed(),user=state.users.find(user=>user.id===ids.resident)!;
   const principal={...syntheticPrincipal(user),verified:false};

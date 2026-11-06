@@ -1,10 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { BOARD_TYPES, type Appointment, type Base, type Case, type CaseStatus, type Meeting, type Principal, type Role, type State, type Workspace } from '../shared/model.ts';
-import { activeGrant, assert, boardFor, canReadCase, caseOfficer, has, inScope, requireRole, restricted, userFor } from './policy.ts';
+import { contactAllowed, activeGrant, assert, boardFor, canReadCase, caseOfficer, has, inScope, requireRole, restricted, userFor } from './policy.ts';
 import { canUseEvidenceTarget } from './policy.ts';
 import { actionItems } from './reminders.ts';
 import { includeSettlement } from './inec-geography.ts';
+import { config } from './config.ts';
 import { tours } from '../shared/tours.ts';
 
 const str = (min = 1, max = 1000) => z.string().trim().min(min).max(max);
@@ -185,7 +186,7 @@ export function execute(s: State,p: Principal,action: Action,input: unknown): { 
       assert(['LGA','WARD','COMMUNITY'].includes(geo.type),'Choose a local jurisdiction.');
       requireRole(s,p,coords,geo.id);
       const recipient=find(s.users,d.recipientId);
-      assert(recipient.id!==p.id && recipient.verified && recipient.grants.some(g=>g.role==='AGENCY_OFFICER' && !g.boardId && activeGrant(s,recipient,g) && inScope(s,g.jurisdiction,geo.id)),'Choose a verified recipient with an active agency officer grant in this jurisdiction.');
+      assert(recipient.id!==p.id && contactAllowed(recipient) && recipient.grants.some(g=>g.role==='AGENCY_OFFICER' && !g.boardId && activeGrant(s,recipient,g) && inScope(s,g.jurisdiction,geo.id)),'Choose a verified recipient with an active agency officer grant in this jurisdiction.');
       assert(!s.agencies.some(a=>!a.revokedAt&&a.jurisdiction===geo.id&&a.name.toLowerCase()===d.name.toLowerCase()),'This agency is already registered in the jurisdiction.');
       const agency={...stamp(),...d,proposedBy:p.id};
       s.agencies.push(agency);
@@ -278,7 +279,7 @@ export function execute(s: State,p: Principal,action: Action,input: unknown): { 
     case 'taskDeadline': {const d=read(action),t=find(s.tasks,d.id),b=boardFor(s,t.boardId);requireRole(s,p,officers,b.jurisdiction,b.id);assert(!restricted(s,p.id,t.id),'You are recused from this action.');assert(t.status==='OPEN','Only open tasks can be rescheduled.');assert(new Date(d.dueAt).getTime()>Date.now(),'A new deadline must be in the future.');t.dueAt=new Date(d.dueAt).toISOString();t.updatedAt=now;entityId=t.id;jurisdiction=b.jurisdiction;break;}
     case 'profile': { const d=read(action); me.name=d.name; me.updatedAt=now; break; }
     case 'residency': {
-      assert(p.verified,'Verify your email address before requesting community membership.','VERIFICATION_REQUIRED',403);
+      assert(contactAllowed(p),'Verify your email address before requesting community membership.','VERIFICATION_REQUIRED',403);
       const d=read(action); includeSettlement(s,d.jurisdiction); assert(s.geos.some(g=>g.id===d.jurisdiction && g.type==='COMMUNITY'),'Select an imported community.');
       assert(!s.residencies.some(r=>r.userId===p.id && r.status==='PENDING'),'A residency review is already pending.');
       const r={...stamp(),...d,userId:p.id,status:'PENDING'}; s.residencies.push(r); entityId=r.id;jurisdiction=d.jurisdiction; break;
@@ -327,7 +328,7 @@ export function execute(s: State,p: Principal,action: Action,input: unknown): { 
     case 'conflict': {const d=read(action),b=boardFor(s,d.boardId);requireRole(s,p,monitors,b.jurisdiction,b.id);const c={...stamp(),...d,userId:p.id,status:'PENDING'};s.conflicts.push(c);entityId=c.id;jurisdiction=b.jurisdiction;break;}
     case 'reviewConflict': {const d=read(action),c=find(s.conflicts,d.id),b=boardFor(s,c.boardId);requireRole(s,p,['ETHICS_REVIEWER'],b.jurisdiction);assert(c.userId!==p.id,'Independent conflict review required.');assert(c.status==='PENDING','Conflict already reviewed.');c.status=d.restrict?'RESTRICTED':'CLEARED';c.reviewerId=p.id;entityId=c.id;jurisdiction=b.jurisdiction;break;}
     case 'submitCase': {
-      const d=read(action);assert(p.verified,'Verify your contact before submitting a report.','CONTACT_VERIFICATION_REQUIRED',403);
+      const d=read(action);assert(contactAllowed(p),'Verify your contact before submitting a report.','CONTACT_VERIFICATION_REQUIRED',403);
       includeSettlement(s,d.jurisdiction);
       assert(s.geos.some(g=>g.id===d.jurisdiction && g.type==='COMMUNITY'),'Select a registered community.');
       const prior=s.cases.find(c=>c.reporterId===p.id && c.clientRequestId===d.clientRequestId);if(prior)return {id:prior.id};
@@ -461,7 +462,7 @@ export function workspace(s: State,p: Principal|null,mode: 'synthetic'|'appwrite
       const c=find(s.cases,r.caseId),agency=find(s.agencies,r.agencyId);
       return (p?.id!==c.reporterId&&canReadCase(s,p,c))||(r.recipientId===p?.id&&recipientAccess(s,p,agency,c.jurisdiction)&&!restricted(s,p.id,c.id));
     }).map(r=>cases.some(c=>c.id===r.caseId)?r:{...r,caseId:'',recordedBy:'',responses:r.responses?.map(response=>({...response,followUps:undefined}))}),
-    me,mode,boardTypes:BOARD_TYPES,demoProfiles:mode==='synthetic'?s.users.filter(u=>u.synthetic).map(u=>({id:u.id,name:u.name,role:u.grants[0]?.role??'RESIDENT'})):[],
+    me,mode,testingMode:config.CBS_TESTING_MODE,boardTypes:BOARD_TYPES,demoProfiles:mode==='synthetic'?s.users.filter(u=>u.synthetic).map(u=>({id:u.id,name:u.name,role:u.grants[0]?.role??'RESIDENT'})):[],
     users,geos:s.geos,residencies:s.residencies.filter(r=>r.userId===p?.id||scoped(r.jurisdiction)),boards,
     evidence:s.evidence.filter(e=>canUseEvidenceTarget(s,p,e.targetType,e.targetId)),actionItems:actionItems(s,p),
     nominations:s.nominations.filter(n=>n.candidateId===p?.id||n.nominatorId===p?.id||scoped(boardFor(s,n.boardId).jurisdiction)),

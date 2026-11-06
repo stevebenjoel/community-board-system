@@ -68,7 +68,7 @@ export async function handleRequest(req:IncomingMessage,res:ServerResponse){
         assert(!origin||origin===config.APP_ORIGIN,'This request origin is not allowed.','ORIGIN_DENIED',403);
         if(config.CBS_MODE==='synthetic')assert(req.headers['x-cbs-client']==='web','Missing request protection.','CSRF_DENIED',403);
       }
-      if(path==='/api/v1/config'&&req.method==='GET'){send(res,200,{mode:config.CBS_MODE,appwriteEndpoint:config.APPWRITE_ENDPOINT??'',appwriteProjectId:config.APPWRITE_PROJECT_ID??''});return;}
+      if(path==='/api/v1/config'&&req.method==='GET'){send(res,200,{mode:config.CBS_MODE,appwriteEndpoint:config.APPWRITE_ENDPOINT??'',appwriteProjectId:config.APPWRITE_PROJECT_ID??'',testingMode:config.CBS_TESTING_MODE});return;}
       if(path==='/api/v1/demo-session'&&req.method==='POST'){
         assert(config.CBS_MODE==='synthetic'&&config.NODE_ENV!=='production','Not found.','NOT_FOUND',404);
         const d=z.object({userId:z.string()}).strict().parse(await body(req));const user=(await store.read()).users.find(u=>u.id===d.userId&&u.synthetic);assert(user,'Unknown synthetic profile.');

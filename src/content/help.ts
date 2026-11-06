@@ -27,6 +27,7 @@ export const helpTopics: HelpTopic[] = [
       'Authorized officers investigate, document findings, and obtain independent approvals. Acknowledgement alone never means an issue is fixed.',
     ],
     questions: [
+      { question: 'Can I test before email and two-factor authentication are configured?', answer: 'Yes. While testing mode is active, creating an account continues directly to community membership without a verification email or a two-factor prompt. Existing accounts can sign in with email and password. Community requests still need coordinator approval, and officer permissions still require an assigned role.' },
       { question: 'How do I find a board from Overview?', answer: 'Choose its labeled card in the board directory. Each board has a distinct icon and color, and the board name identifies it.' },
       { question: 'Where can I change the appearance?', answer: 'Select Dark mode in the top bar. Select it again to return to light mode. On first use, the app follows your device preference.' },
       { question: 'What is the Community Board System?', answer: 'CBS is a participatory governance and accountability platform. It organizes community membership, seven thematic boards, confidential cases, public project oversight, meetings, and resolutions.' },
@@ -40,8 +41,8 @@ export const helpTopics: HelpTopic[] = [
     summary: 'Appwrite manages production identity. CBS applies your permissions after sign-in; creating an account never appoints you to a board.',
     steps: [
       'For the local preview, use Explore as in the pilot bar. Start with Ada Okafor, the synthetic resident. These profiles are unavailable in production.',
-      'On the hosted website, select Sign in to join a community to open Join your community. Create an account with your full name, email and a password of at least eight characters, then confirm the password. Existing members choose Already registered? Sign in.',
-      'Open the email verification link, then continue to your community. If the link opens in a different browser, sign in there. Use Resend verification email if needed. Community choices are retained in the current tab while you register.',
+      'On the hosted website, select Sign in to join a community to open Join your community. Create an account with your full name, email and a password of at least eight characters, then confirm the password. Existing members choose Already registered? Sign in. During the temporary testing period, continue directly to community membership.',
+      'When email verification is required, open the verification link and continue to your community. If the link opens in a different browser, sign in there. Use Resend verification email if needed. Community choices are retained in the current tab while you register.',
       'Follow the verification email to verify your contact. Use Edit profile to change your CBS display name.',
       'For privileged accounts, set up an authenticator and verify your MFA session. A valid scoped grant and, for board officers, an effective appointment are also required.',
       'Sign out when finished. Check sessions & MFA shows the session count and MFA status; it does not provide a complete session-management console.',
@@ -69,7 +70,7 @@ export const helpTopics: HelpTopic[] = [
     questions: [
       { question: 'Where do the LGA, ward and community options come from?', answer: 'The picker uses INEC reference records for 774 LGAs and FCT area councils and 8,809 electoral wards. When you select a ward, CBS loads GRID3 settlement names matched to that ward and any separately imported community records. GRID3 matches are source references for selecting a location. Residency verification is a separate step.' },
       { question: 'Why is my community missing?', answer: 'GRID3 coverage varies and some settlement records could not be linked to a unique INEC ward. Where no matched or separately imported records exist, the picker displays an empty community list.' },
-      { question: 'Does registration immediately make me a verified community member?', answer: 'First verify your email. Next select your community and submit a residency statement or attestation reference. A different authorized coordinator reviews the request. Verification history shows the pending, verified or rejected decision and its reason.' },
+      { question: 'Does registration immediately make me a verified community member?', answer: 'Select your community and submit a residency statement or attestation reference. A different authorized coordinator reviews the request. Verification history shows the pending, verified or rejected decision and its reason. Email verification is required when temporary testing mode is off.' },
       { question: 'Must I supply a national identity number or voter details?', answer: 'No. The current workflow uses residency statements or attestation references. Do not submit NIN or biometrics. A CBS community association is not proof of voter registration.' },
       { question: 'Can an unverified resident browse public information or raise a concern?', answer: 'Public information remains accessible. Case submission requires a signed-in identity with verified contact and a registered community; it does not require completed residency approval. Nomination eligibility and officer access have stronger checks.' },
     ],

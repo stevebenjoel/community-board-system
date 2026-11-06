@@ -6,6 +6,7 @@ for(const file of ['.env.local','.env']) if(existsSync(file))loadEnvFile(file);
 const schema=z.object({
   NODE_ENV:z.enum(['development','test','production']).default('development'),
   CBS_MODE:z.enum(['synthetic','appwrite']).default('synthetic'),
+  CBS_TESTING_MODE:z.enum(['true','false']).default('false').transform(value=>value==='true'),
   PORT:z.coerce.number().int().min(1).max(65535).default(3001),
   HOST:z.string().default('127.0.0.1'),
   APP_ORIGIN:z.string().url().default('http://127.0.0.1:5173'),

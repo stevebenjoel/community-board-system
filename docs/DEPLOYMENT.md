@@ -58,6 +58,8 @@ Selected-addition deployment: see ADDITIONS_GUIDE.md. Add Appwrite Storage bucke
 
 ## Connected Appwrite project
 
+Temporary password-only testing is controlled by CBS_TESTING_MODE. The Compose file defaults it to true for the owner's requested testing period. New registration skips verification email delivery, member actions accept unverified contact, and scoped officer actions accept single-factor sessions. Appwrite's recorded contact verification and session factors remain accurate. Set CBS_TESTING_MODE=false in Coolify and redeploy to restore the app's email and MFA requirements. Appwrite account-level MFA enrollment remains a separate setting.
+
 The endpoint is https://appwrite.diplomat-server.base44-ng.online/v1 and the project ID is 6aec6c54003e61828de5. Provisioning was verified against server version 1.8.1 on 5 November 2026. Database cbs contains the private cbs_records, cbs_control and cbs_board_types tables. The kind and ordinal indexes are available. The private cbs_evidence bucket accepts PNG, JPEG, PDF and MP4 attachments up to 4 MiB.
 
 Supply APPWRITE_PROVISIONING_KEY only to the database migration and seed commands. Those commands select this credential explicitly. The running API requires APPWRITE_API_KEY. The provisioning credential was loaded from the owner's supplied file into the provisioning process and was not saved into the project environment file.

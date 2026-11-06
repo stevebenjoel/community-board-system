@@ -20,9 +20,10 @@ export function Join(){
   const residency=w.residencies.find(item=>item.userId===w.me?.id&&['PENDING','VERIFIED'].includes(item.status));
   if(w.me)return <>
     <Heading title="Your community membership" description="Complete your account and community verification."/>
-    <Panel title={w.me.verified?'Choose your community':'Verify your email address'}>
+    <Panel title={w.me.verified||w.testingMode?'Choose your community':'Verify your email address'}>
+      {w.testingMode&&<p role="status">Testing mode is active. Email verification and two-factor authentication are temporarily paused.</p>}
       <p>Signed in as {w.me.name} · {w.me.email}</p>
-      {!w.me.verified?<>
+      {!w.me.verified&&!w.testingMode?<>
         <p>Open the verification link sent to your email address, then continue here.</p>
         <div className="action-row">
           <button className="button" disabled={busy} onClick={()=>void checkEmail()}>I have verified my email</button>
