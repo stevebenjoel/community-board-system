@@ -36,6 +36,10 @@ Select Sign in to continue as the demo resident. In My community, your current s
 
 Check your spam folder and use Resend verification email on the membership page. If your account already exists, sign in or use Forgot password. Verification delivery depends on the deployment’s email service.
 
+### What should I do if registration reported an expired session after creating my account?
+
+Choose Already registered? Sign in and use the same email and password. After signing in, use Resend verification email if needed, then continue to your community. Account creation may already have succeeded before the earlier error.
+
 ### Can I register myself as a chair or administrator?
 
 No. Registration creates an identity without privileged grants. Appointments and scoped grants follow authorized approval workflows. The server rejects self-promotion even if a request is manually changed.

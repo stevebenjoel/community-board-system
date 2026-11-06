@@ -1,3 +1,4 @@
+import { appwritePrincipal } from './authentication.ts';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -7,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { type Principal } from '../shared/model.ts';
 import { config } from './config.ts';
-import { appwrite, createStore } from './store.ts';
+import { createStore } from './store.ts';
 import { appendAudit, commands, execute, workspace, type Action } from './domain.ts';
 import { assert, DomainError } from './policy.ts';
 import { addBoardSamples, syntheticPrincipal, syntheticSeed } from './seed.ts';
@@ -33,9 +34,7 @@ async function principal(req:IncomingMessage):Promise<Principal|null>{
     const user=(await store.read()).users.find(x=>x.id===session.userId);return user?syntheticPrincipal(user):null;
   }
   const auth=req.headers.authorization;if(!auth?.startsWith('Bearer '))return null;
-  const credential={jwt:auth.slice(7)};
-  try{const account=await appwrite('/account','GET',undefined,credential);const session=await appwrite('/account/sessions/current','GET',undefined,credential);
-    return {id:String(account.$id),name:String(account.name||'Resident'),email:String(account.email||''),verified:account.emailVerification===true||account.phoneVerification===true,mfa:Array.isArray(session.factors)&&session.factors.length>=2};
+  try{return await appwritePrincipal(auth.slice(7));
   }catch{throw new DomainError('SESSION_INVALID','Your session expired. Please sign in again.',401);}
 }
 export async function handleRequest(req:IncomingMessage,res:ServerResponse){

@@ -6,6 +6,26 @@ import { randomUUID } from 'node:crypto';
 import { demoIds } from '../server/seed.ts';
 process.env.CBS_MODE='synthetic';process.env.CBS_DB_PATH=':memory:';process.env.CBS_CLAMAV_HOST='';
 const {handleRequest,closeStore}=await import('../server/index.ts');
+const {appwritePrincipal}=await import('../server/authentication.ts');
+test('Appwrite JWT authentication uses the validated explicit session and preserves MFA enforcement',async()=>{
+  const jwt='header.'+Buffer.from(JSON.stringify({userId:'user-1',sessionId:'session-1'})).toString('base64url')+'.signature';
+  const paths:string[]=[];
+  const request=async(path:string)=>{
+    paths.push(path);
+    if(path==='/account')return {$id:'user-1',email:'resident@example.invalid',emailVerification:false};
+    assert.equal(path,'/account/sessions/session-1');
+    return {$id:'session-1',userId:'user-1',factors:['password']};
+  };
+  const principal=await appwritePrincipal(jwt,request);
+  assert.deepEqual(paths,['/account','/account/sessions/session-1']);
+  assert.equal(principal.id,'user-1');
+  assert.equal(principal.verified,false);
+  assert.equal(principal.mfa,false);
+  await assert.rejects(appwritePrincipal(jwt,async path=>path==='/account'?{$id:'user-1'}:{$id:'session-1',userId:'other-user',factors:['password','totp']}),/does not belong/);
+  let requests=0;
+  await assert.rejects(appwritePrincipal(jwt,async()=>{requests++;throw new Error('Token rejected by Appwrite');}),/Token rejected/);
+  assert.equal(requests,1);
+});
 after(()=>closeStore());
 async function call(path:string,method='GET',payload?:unknown,cookie?:string,origin='http://127.0.0.1:5173',client='web'){
   const request=Object.assign(Readable.from(payload===undefined?[]:[Buffer.from(JSON.stringify(payload))]),{url:`/api/v1${path}`,method,headers:{'content-type':'application/json','x-cbs-client':client,origin,cookie},socket:{remoteAddress:'127.0.0.1'}}) as unknown as IncomingMessage;
