@@ -19,9 +19,19 @@ export const command=(action:string,payload:unknown)=>request<{id:string}>('/com
 export const demoSignIn=(userId:string)=>request('/demo-session',{userId});
 export async function signOut(){if(account)await account.deleteSession({sessionId:'current'});await request('/logout',{});}
 export async function login(email:string,password:string){if(!account)throw new Error('Choose a synthetic profile in the local pilot.');await account.createEmailPasswordSession({email,password});await request('/session',{});}
-export async function register(name:string,email:string,password:string){if(!account)throw new Error('Registration requires an Appwrite connection. Use a synthetic profile locally.');await account.create({userId:ID.unique(),email,password,name});await account.createEmailPasswordSession({email,password});await request('/session',{});await account.createVerification({url:`${location.origin}/auth/verify`});}
+export async function sendVerification(){if(!account)throw new Error('Appwrite is not connected.');await account.createVerification({url:`${location.origin}/auth/verify`});}
+export async function restoreAccount(){if(!account)return;await account.get();await request('/session',{});}
+export async function syncAccount(){if(account)await request('/session',{});}
+export async function register(name:string,email:string,password:string){
+  if(!account)throw new Error('Registration requires an Appwrite connection.');
+  await account.create({userId:ID.unique(),email,password,name});
+  await account.createEmailPasswordSession({email,password});
+  await request('/session',{});
+  try{await sendVerification();return {verificationSent:true};}
+  catch{return {verificationSent:false};}
+}
 export async function recover(email:string){if(!account)throw new Error('Account recovery is available when Appwrite is connected.');await account.createRecovery({email,url:`${location.origin}/auth/recover`});}
-export async function verifyContact(userId:string,secret:string){if(!account)throw new Error('Appwrite is not connected.');await account.updateVerification({userId,secret});await request('/session',{});}
+export async function verifyContact(userId:string,secret:string){if(!account)throw new Error('Appwrite is not connected.');await account.updateVerification({userId,secret});try{await request('/session',{});}catch{/* The email is verified even when the link opens outside the signed-in browser. */}}
 export async function resetPassword(userId:string,secret:string,password:string){if(!account)throw new Error('Appwrite is not connected.');await account.updateRecovery({userId,secret,password});}
 export async function securityInfo(){if(!account)return null;const [user,sessions]=await Promise.all([account.get(),account.listSessions()]);return {user,sessions:sessions.sessions};}
 export async function beginMfa(){if(!account)throw new Error('MFA enrolment requires Appwrite. Synthetic officer profiles simulate MFA.');return account.createMfaAuthenticator({type:AuthenticatorType.Totp});}

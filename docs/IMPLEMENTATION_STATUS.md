@@ -1,5 +1,7 @@
 # Implementation status — 3 November 2026
 
+On 6 November 2026, the public website health and configuration endpoints confirmed Appwrite mode, and the authentication endpoint allowed the communityboardsystem.org browser origin. The registration page now covers account creation, sign-in, recovery, email verification and resend, and the handoff to community membership. Email delivery and a real resident-to-coordinator approval journey still require hosted acceptance testing.
+
 The board review inbox uses server-calculated eligibility. Formal minutes and resolution amendments preserve the source text and require a separate approver. Scoped agency referrals support independent coordinator verification and in-app acknowledgement by the designated recipient.
 
 The local synthetic preview includes a public demo project, milestone and matching review agenda for every board. Existing synthetic pilot databases receive these records additively on startup.

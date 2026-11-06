@@ -32,13 +32,15 @@ Appwrite manages production identity. CBS applies your permissions after sign-in
 
 1. For the local preview, use Explore as in the pilot bar. Start with Ada Okafor, the synthetic resident. These profiles are unavailable in production.
 
-2. With Appwrite connected, open My profile & security to create an account, sign in with email/password, or request account recovery.
+2. On the hosted website, select Sign in to join a community to open Join your community. Create an account with your full name, email and a password of at least eight characters, then confirm the password. Existing members choose Already registered? Sign in.
 
-3. Follow the verification email to verify your contact. Use Edit profile to change your CBS display name.
+3. Open the email verification link, then continue to your community. If the link opens in a different browser, sign in there. Use Resend verification email if needed. Community choices are retained in the current tab while you register.
 
-4. For privileged accounts, set up an authenticator and verify your MFA session. A valid scoped grant and, for board officers, an effective appointment are also required.
+4. Follow the verification email to verify your contact. Use Edit profile to change your CBS display name.
 
-5. Sign out when finished. Check sessions & MFA shows the session count and MFA status; it does not provide a complete session-management console.
+5. For privileged accounts, set up an authenticator and verify your MFA session. A valid scoped grant and, for board officers, an effective appointment are also required.
+
+6. Sign out when finished. Check sessions & MFA shows the session count and MFA status; it does not provide a complete session-management console.
 
 Current boundary: Live Appwrite account, verification, recovery, and MFA flows are implemented integration boundaries but remain unverified against a supplied project. No credentials are embedded in the app.
 

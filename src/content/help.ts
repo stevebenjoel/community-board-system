@@ -40,13 +40,15 @@ export const helpTopics: HelpTopic[] = [
     summary: 'Appwrite manages production identity. CBS applies your permissions after sign-in; creating an account never appoints you to a board.',
     steps: [
       'For the local preview, use Explore as in the pilot bar. Start with Ada Okafor, the synthetic resident. These profiles are unavailable in production.',
-      'With Appwrite connected, open My profile & security to create an account, sign in with email/password, or request account recovery.',
+      'On the hosted website, select Sign in to join a community to open Join your community. Create an account with your full name, email and a password of at least eight characters, then confirm the password. Existing members choose Already registered? Sign in.',
+      'Open the email verification link, then continue to your community. If the link opens in a different browser, sign in there. Use Resend verification email if needed. Community choices are retained in the current tab while you register.',
       'Follow the verification email to verify your contact. Use Edit profile to change your CBS display name.',
       'For privileged accounts, set up an authenticator and verify your MFA session. A valid scoped grant and, for board officers, an effective appointment are also required.',
       'Sign out when finished. Check sessions & MFA shows the session count and MFA status; it does not provide a complete session-management console.',
     ],
     questions: [
       { question: 'How do I sign in to the local preview?', answer: 'Select Sign in to continue as the demo resident. In My community, your current selection stays in place so you can request verification. Use Explore as in the pilot bar to switch to another demo role.' },
+      { question: 'What if account creation succeeds but the email does not arrive?', answer: 'Check your spam folder and use Resend verification email on the membership page. If your account already exists, sign in or use Forgot password. Verification delivery depends on the deployment’s email service.' },
       { question: 'Can I register myself as a chair or administrator?', answer: 'No. Registration creates an identity without privileged grants. Appointments and scoped grants follow authorized approval workflows. The server rejects self-promotion even if a request is manually changed.' },
       { question: 'Why is an officer action denied after I sign in?', answer: 'Possible reasons include an unverified contact, an incomplete MFA session, a missing or expired grant, an inactive appointment or board, a different jurisdiction, a conflict restriction, or a required independent reviewer.' },
       { question: 'How do I recover an Appwrite account?', answer: 'Use Recover account from the signed-out profile page and follow the provider’s emailed recovery link. Local synthetic profiles do not use a password-recovery flow.' },
@@ -66,6 +68,7 @@ export const helpTopics: HelpTopic[] = [
     questions: [
       { question: 'Where do the LGA, ward and community options come from?', answer: 'The picker uses INEC reference records for 774 LGAs and FCT area councils and 8,809 electoral wards. When you select a ward, CBS loads GRID3 settlement names matched to that ward and any separately imported community records. GRID3 matches are source references for selecting a location. Residency verification is a separate step.' },
       { question: 'Why is my community missing?', answer: 'GRID3 coverage varies and some settlement records could not be linked to a unique INEC ward. Where no matched or separately imported records exist, the picker displays an empty community list.' },
+      { question: 'Does registration immediately make me a verified community member?', answer: 'First verify your email. Next select your community and submit a residency statement or attestation reference. A different authorized coordinator reviews the request. Verification history shows the pending, verified or rejected decision and its reason.' },
       { question: 'Must I supply a national identity number or voter details?', answer: 'No. The current workflow uses residency statements or attestation references. Do not submit NIN or biometrics. A CBS community association is not proof of voter registration.' },
       { question: 'Can an unverified resident browse public information or raise a concern?', answer: 'Public information remains accessible. Case submission requires a signed-in identity with verified contact and a registered community; it does not require completed residency approval. Nomination eligibility and officer access have stronger checks.' },
     ],

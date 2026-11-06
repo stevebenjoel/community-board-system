@@ -32,6 +32,10 @@ Full workflow: /documentation#guide-start
 
 Select Sign in to continue as the demo resident. In My community, your current selection stays in place so you can request verification. Use Explore as in the pilot bar to switch to another demo role.
 
+### What if account creation succeeds but the email does not arrive?
+
+Check your spam folder and use Resend verification email on the membership page. If your account already exists, sign in or use Forgot password. Verification delivery depends on the deployment’s email service.
+
 ### Can I register myself as a chair or administrator?
 
 No. Registration creates an identity without privileged grants. Appointments and scoped grants follow authorized approval workflows. The server rejects self-promotion even if a request is manually changed.
@@ -55,6 +59,10 @@ The picker uses INEC reference records for 774 LGAs and FCT area councils and 8,
 ### Why is my community missing?
 
 GRID3 coverage varies and some settlement records could not be linked to a unique INEC ward. Where no matched or separately imported records exist, the picker displays an empty community list.
+
+### Does registration immediately make me a verified community member?
+
+First verify your email. Next select your community and submit a residency statement or attestation reference. A different authorized coordinator reviews the request. Verification history shows the pending, verified or rejected decision and its reason.
 
 ### Must I supply a national identity number or voter details?
 

@@ -278,6 +278,7 @@ export function execute(s: State,p: Principal,action: Action,input: unknown): { 
     case 'taskDeadline': {const d=read(action),t=find(s.tasks,d.id),b=boardFor(s,t.boardId);requireRole(s,p,officers,b.jurisdiction,b.id);assert(!restricted(s,p.id,t.id),'You are recused from this action.');assert(t.status==='OPEN','Only open tasks can be rescheduled.');assert(new Date(d.dueAt).getTime()>Date.now(),'A new deadline must be in the future.');t.dueAt=new Date(d.dueAt).toISOString();t.updatedAt=now;entityId=t.id;jurisdiction=b.jurisdiction;break;}
     case 'profile': { const d=read(action); me.name=d.name; me.updatedAt=now; break; }
     case 'residency': {
+      assert(p.verified,'Verify your email address before requesting community membership.','VERIFICATION_REQUIRED',403);
       const d=read(action); includeSettlement(s,d.jurisdiction); assert(s.geos.some(g=>g.id===d.jurisdiction && g.type==='COMMUNITY'),'Select an imported community.');
       assert(!s.residencies.some(r=>r.userId===p.id && r.status==='PENDING'),'A residency review is already pending.');
       const r={...stamp(),...d,userId:p.id,status:'PENDING'}; s.residencies.push(r); entityId=r.id;jurisdiction=d.jurisdiction; break;
@@ -447,6 +448,7 @@ export function workspace(s: State,p: Principal|null,mode: 'synthetic'|'appwrite
   const country=s.geos.find(g=>g.type==='COUNTRY')?.id??'';
   const admin=has(s,p,['PLATFORM_ADMIN'],country);
   const peerIds=new Set(s.appointments.filter(a=>boards.some(b=>b.id===a.boardId)&&boardAccess(a.boardId)).map(a=>a.userId));
+  for(const residency of s.residencies)if(has(s,p,coords,residency.jurisdiction))peerIds.add(residency.userId);
   const users=s.users.filter(u=>u.id===p?.id||peerIds.has(u.id)||(mode==='synthetic'&&p)).map(u=>u.id===p?.id?u:{...u,email:'',tours:undefined,grants:u.grants.filter(g=>has(s,p,[...coords,'ETHICS_REVIEWER'],g.jurisdiction))});
   const scoped=(jurisdiction:string)=>has(s,p,[...coords,'ETHICS_REVIEWER'],jurisdiction);
   return {

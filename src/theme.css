@@ -200,3 +200,4 @@
 .project-media-grid figcaption{padding:12px;overflow-wrap:anywhere}
 .geo-selects .ward-list{width:100%;overflow-y:auto;scrollbar-gutter:stable}
 .ward-selection{display:flex;flex-direction:column;align-items:flex-start;gap:9px;font-size:12px}.ward-selection>span{font-size:11px}
+.registration-panel{max-width:560px;margin-inline:auto}.registration-panel .form-fields input{width:100%}.registration-panel .form-fields p{line-height:1.7}

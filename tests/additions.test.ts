@@ -8,6 +8,17 @@ import { actionItems,phaseFor,produceReminders } from '../server/reminders.ts';
 import { SqliteStore } from '../server/store.ts';
 import { demoIds as ids,syntheticPrincipal,syntheticSeed } from '../server/seed.ts';
 const actor=(key:keyof typeof ids)=>syntheticPrincipal(syntheticSeed().users.find(u=>u.id===ids[key])!);
+test('real community membership requires verified contact and remains pending until an independent review',()=>{
+  const state=syntheticSeed(),user=state.users.find(user=>user.id===ids.resident)!;
+  const principal={...syntheticPrincipal(user),verified:false};
+  const data={jurisdiction:ids.community,method:'COMMUNITY_ATTESTATION',statement:'My community representative can attest to my residency.'};
+  assert.throws(()=>execute(state,principal,'residency',data),/Verify your email/);
+  const {id}=execute(state,{...principal,verified:true},'residency',data);
+  assert.equal(state.residencies.find(item=>item.id===id)?.status,'PENDING');
+  assert.throws(()=>execute(state,actor('resident'),'reviewResidency',{id,approved:true,reason:'Attempt to approve my own residency.'}));
+  execute(state,actor('coordinator'),'reviewResidency',{id,approved:true,reason:'Community attestation independently checked.'});
+  assert.equal(state.residencies.find(item=>item.id===id)?.status,'VERIFIED');
+});
 const pdf=Buffer.from('%PDF-1.7\nSYNTHETIC test document\n%%EOF');
 const upload=(targetId=syntheticSeed().cases[0].id)=>({targetType:'CASE' as const,targetId,filename:'synthetic-note.pdf',mime:'application/pdf' as const,contentBase64:pdf.toString('base64'),clientRequestId:randomUUID()});
 async function vault(scanner:Scanner){const store=new SqliteStore(':memory:');await store.transaction(s=>Object.assign(s,syntheticSeed()));return {store,service:new EvidenceService(store,undefined,scanner)};}
