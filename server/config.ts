@@ -17,7 +17,7 @@ const schema=z.object({
   CBS_REMINDER_INTERVAL_MS:z.coerce.number().int().min(60000).default(900000),
 });
 export const config=schema.parse(process.env);
-const provisioning=basename(process.argv[1]??'')==='database.ts';
+const provisioning=['database.ts','grant.ts'].includes(basename(process.argv[1]??''));
 export const appwriteKey=provisioning?config.APPWRITE_PROVISIONING_KEY:config.APPWRITE_API_KEY;
 if(config.NODE_ENV==='production'&&config.CBS_MODE!=='appwrite')throw new Error('Production requires CBS_MODE=appwrite. Synthetic mode is loopback-only.');
 if(config.CBS_MODE==='synthetic'&&!['127.0.0.1','localhost','::1'].includes(config.HOST))throw new Error('Synthetic mode can bind only to loopback.');
