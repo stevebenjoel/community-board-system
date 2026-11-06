@@ -1,7 +1,7 @@
 import communityBoardLogo from './assets/community-board-logo.png';
 import { useCallback,useEffect,useState } from 'react';
 import type { Workspace } from '../shared/model';
-import { Context,enums,field,opts,select } from './context';
+import { Context,enums,field,select } from './context';
 import { Empty,Icon,ModalForm,pretty,type FormSpec } from './components';
 import * as api from './lib/api';
 import { Cases } from './pages/Cases';
@@ -53,7 +53,7 @@ export function App(){
     }
     go('/join');
   }
-  function report(){if(!w?.me){signIn();return;}const community=w.residencies.find(r=>r.userId===w.me?.id&&r.status==='VERIFIED')?.jurisdiction;form('Report a community issue','submitCase',{clientRequestId:crypto.randomUUID()},[select('category','Which area does this concern?',enums(['EDU','HLT','SEC','INF','TRD','YTH','CUL','GENERAL','CONDUCT']),'INF'),field('title','Issue title'),field('description','Describe what happened','textarea',{hint:'20–10,000 characters. Include facts you can personally describe.'}),select('jurisdiction','Community',opts(w.geos.filter(g=>g.type==='COMMUNITY')),community),field('location','Approximate location or landmark','text',{required:false}),select('urgency','Urgency',enums(['NORMAL','HIGH','URGENT']),'NORMAL')],'Reports are confidential. Safety reports use restricted intake. CBS does not provide emergency dispatch. Contact your local authorized emergency service directly if there is immediate danger.');}
+  function report(){if(!w?.me){signIn();return;}const community=w.residencies.find(r=>r.userId===w.me?.id&&r.status==='VERIFIED')?.jurisdiction;form('Report a community issue','submitCase',{clientRequestId:crypto.randomUUID()},[select('category','Which area does this concern?',enums(['EDU','HLT','SEC','INF','TRD','YTH','CUL','GENERAL','CONDUCT']),'INF'),field('title','Issue title'),field('description','Describe what happened','textarea',{hint:'20–10,000 characters. Include facts you can personally describe.'}),{name:'jurisdiction',label:'Community',type:'community',value:community},field('location','Approximate location or landmark','text',{required:false}),select('urgency','Urgency',enums(['NORMAL','HIGH','URGENT']),'NORMAL')],'Reports are confidential. Safety reports use restricted intake. CBS does not provide emergency dispatch. Contact your local authorized emergency service directly if there is immediate danger.');}
   useEffect(()=>{if(!runtime||!path.startsWith('/auth/'))return;const params=new URLSearchParams(location.search),userId=params.get('userId'),secret=params.get('secret');if(!userId||!secret)return;
     if(path==='/auth/verify')api.verifyContact(userId,secret).then(()=>{setToast('Email verified. Continue with community membership.');history.replaceState({},'','/join');setPath('/join');void refresh();}).catch(e=>setError(String(e)));
     if(path==='/auth/recover')setModal({title:'Choose a new password',fields:[field('password','New password','password')],submit:async d=>{await api.resetPassword(userId,secret,String(d.password));history.replaceState({},'','/');setPath('/');setToast('Password updated. Sign in to continue.');}});

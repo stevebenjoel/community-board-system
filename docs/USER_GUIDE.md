@@ -118,15 +118,17 @@ Audience: Residents
 
 A case is a confidential, traceable record. The resident sees its status and citizen-visible updates, while internal investigation notes remain restricted.
 
-1. Choose Report an issue. Select the relevant board/category, add a 5–160 character title and a 20–10,000 character factual description, choose the community, and optionally add a landmark.
+1. Inside Report a community issue, select a state/FCT, LGA and ward to load Community / Settlement options. Wait for the community list to load before submitting. Saved report drafts retain these location selections.
 
-2. Set urgency and submit. The app shows success only after the server commits the report. The case receives a generated reference and a submission event.
+2. Choose Report an issue. Select the relevant board/category, add a 5–160 character title and a 20–10,000 character factual description, choose the community, and optionally add a landmark.
 
-3. For an ordinary report, Save draft retains a per-account draft in this browser tab. A saved draft has not been submitted; safety reports cannot use browser draft storage.
+3. Set urgency and submit. The app shows success only after the server commits the report. The case receives a generated reference and a submission event.
 
-4. Open Cases & reports and select the record to follow its history. Add information through the case detail page when you have further facts.
+4. For an ordinary report, Save draft retains a per-account draft in this browser tab. A saved draft has not been submitted; safety reports cannot use browser draft storage.
 
-5. When a case is closed, rejected with reasons, or linked as a duplicate, the reporter can request an appeal from the detail page. Reopening requires an authorized review.
+5. Open Cases & reports and select the record to follow its history. Add information through the case detail page when you have further facts.
+
+6. When a case is closed, rejected with reasons, or linked as a duplicate, the reporter can request an appeal from the detail page. Reopening requires an authorized review.
 
 Current boundary: Highly restricted safety cases have tighter handler controls. Use only the minimum necessary information, and never rely on CBS for live emergency response.
 

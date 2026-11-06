@@ -117,6 +117,7 @@ export const helpTopics: HelpTopic[] = [
     id: 'cases', title: 'Report, track & appeal an issue', icon: 'cases', audience: 'Residents', route: '/cases',
     summary: 'A case is a confidential, traceable record. The resident sees its status and citizen-visible updates, while internal investigation notes remain restricted.',
     steps: [
+      'Inside Report a community issue, select a state/FCT, LGA and ward to load Community / Settlement options. Wait for the community list to load before submitting. Saved report drafts retain these location selections.',
       'Choose Report an issue. Select the relevant board/category, add a 5–160 character title and a 20–10,000 character factual description, choose the community, and optionally add a landmark.',
       'Set urgency and submit. The app shows success only after the server commits the report. The case receives a generated reference and a submission event.',
       'For an ordinary report, Save draft retains a per-account draft in this browser tab. A saved draft has not been submitted; safety reports cannot use browser draft storage.',
@@ -128,6 +129,7 @@ export const helpTopics: HelpTopic[] = [
       { question: 'What if my connection drops during submission?', answer: 'Retry the same open submission. A stable request ID prevents duplicate creation if the first attempt already committed. Do not assume a report was received until the app confirms success.' },
       { question: 'Where is my saved browser draft?', answer: 'Reopen Report an issue in the same tab and synthetic/account profile. Drafts are tab-scoped, are not official records, and are removed after confirmed submission. Closing the tab or clearing session storage can remove them.' },
       { question: 'Can I attach photos or videos to a report?', answer: 'Yes. Open a submitted case or an authorized project and use Private evidence vault for PNG, JPEG, MP4 or PDF files up to 4 MiB. The server validates file type, stores a private attachment, and checks scanning status. If the scanner is unconfigured or unavailable, the file remains quarantined and cannot be downloaded. Live Appwrite Storage and ClamAV verification is still required before production use.' },
+      { question: 'How do I select a community in the report form?', answer: 'Choose the state or FCT, LGA or area council, and ward inside the form. The Community / Settlement list loads the records for that ward. Your verified community is preselected when available. Changing an earlier selection clears the choices below it.' },
     ],
     notes: ['Highly restricted safety cases have tighter handler controls. Use only the minimum necessary information, and never rely on CBS for live emergency response.'], commands: ['submitCase', 'caseNote'],
   },

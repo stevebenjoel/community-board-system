@@ -132,6 +132,10 @@ Reopen Report an issue in the same tab and synthetic/account profile. Drafts are
 
 Yes. Open a submitted case or an authorized project and use Private evidence vault for PNG, JPEG, MP4 or PDF files up to 4 MiB. The server validates file type, stores a private attachment, and checks scanning status. If the scanner is unconfigured or unavailable, the file remains quarantined and cannot be downloaded. Live Appwrite Storage and ClamAV verification is still required before production use.
 
+### How do I select a community in the report form?
+
+Choose the state or FCT, LGA or area council, and ward inside the form. The Community / Settlement list loads the records for that ward. Your verified community is preselected when available. Changing an earlier selection clears the choices below it.
+
 Full workflow: /documentation#guide-cases
 
 ## Triage, investigation & outcome review
