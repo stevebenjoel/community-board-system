@@ -72,6 +72,10 @@ export class EvidenceService {
     const fileId=createHash('sha256').update(`${p.id}:${input.clientRequestId}`).digest('hex').slice(0,32);
     const reserved=await this.store.transaction(s=>{
       assert(canUseEvidenceTarget(s,p,input.targetType,input.targetId,true),'You cannot attach evidence to this record.','ACCESS_DENIED',403);
+      const target=input.targetType==='CASE'?s.cases.find(c=>c.id===input.targetId):undefined;
+      if(target?.desk?.facilitatorId===p.id){
+        assert(target.desk.voice&&input.mime.startsWith('audio/')&&input.clientRequestId===target.clientRequestId,'Desk access allows only the consented voice attachment for this report.','ACCESS_DENIED',403);
+      }
       const previous=s.evidence.find(e=>e.id===fileId);
       if(previous){assert(previous.sha256===file.sha256&&previous.targetId===input.targetId&&previous.targetType===input.targetType&&previous.filename===file.filename&&previous.mime===input.mime,'This request ID belongs to a different file or target.','IDEMPOTENCY_CONFLICT',409);return previous;}
       const at=new Date().toISOString();const e:Evidence={id:fileId,createdAt:at,updatedAt:at,targetType:input.targetType,targetId:input.targetId,uploadedBy:p.id,filename:file.filename,mime:input.mime,size:file.bytes.length,sha256:file.sha256,clientRequestId:input.clientRequestId,uploadStatus:'UPLOADING',scanStatus:'QUARANTINED',scanEngine:'scan-pending'};
@@ -79,7 +83,7 @@ export class EvidenceService {
     });
     if(reserved.uploadStatus==='STORED')return reserved;
     try{await this.storage.put(fileId,file.bytes,file.filename,input.mime);const scan=await this.scanner(file.bytes);
-      return await this.store.transaction(s=>{const e=this.authorized(s,p,fileId);e.uploadStatus='STORED';e.scanStatus=scan.status;e.scanEngine=scan.engine;e.scannedAt=new Date().toISOString();e.scannedSha256=scan.status==='CLEAN'?e.sha256:undefined;e.updatedAt=e.scannedAt;appendAudit(s,p,'evidence.uploaded',e.id,jurisdictionFor(s,e));return e;});
+      return await this.store.transaction(s=>{const e=s.evidence.find(item=>item.id===fileId);assert(e&&e.uploadedBy===p.id&&canUseEvidenceTarget(s,p,e.targetType,e.targetId,true),'Evidence upload authorization changed.','ACCESS_DENIED',403);e.uploadStatus='STORED';e.scanStatus=scan.status;e.scanEngine=scan.engine;e.scannedAt=new Date().toISOString();e.scannedSha256=scan.status==='CLEAN'?e.sha256:undefined;e.updatedAt=e.scannedAt;appendAudit(s,p,'evidence.uploaded',e.id,jurisdictionFor(s,e));return e;});
     }catch(error){await this.store.transaction(s=>{const e=s.evidence.find(e=>e.id===fileId);if(e&&e.uploadStatus!=='STORED'){e.uploadStatus='FAILED';e.scanStatus='QUARANTINED';e.scanEngine='upload-failed';e.updatedAt=new Date().toISOString();}}).catch(()=>{});throw error;}
   }
   async rescan(p:Principal,id:string){const e=this.authorized(await this.store.read(),p,id);assert(e.uploadStatus==='STORED','Upload must complete before scanning.');assert(e.scanStatus!=='REJECTED','Rejected evidence cannot be released by a rescan.');const bytes=await this.storage.get(id);assert(digest(bytes)===e.sha256,'Evidence integrity check failed.');const scan=await this.scanner(bytes);return this.store.transaction(s=>{const current=this.authorized(s,p,id);assert(current.sha256===e.sha256,'Evidence changed during scanning.');current.scanStatus=scan.status;current.scanEngine=scan.engine;current.scannedAt=new Date().toISOString();current.scannedSha256=scan.status==='CLEAN'?current.sha256:undefined;current.updatedAt=current.scannedAt;appendAudit(s,p,'evidence.scanned',id,jurisdictionFor(s,current));return current;});}

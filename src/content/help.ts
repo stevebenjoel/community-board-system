@@ -136,6 +136,23 @@ export const helpTopics: HelpTopic[] = [
     notes: ['Use a trusted device. The browser retains queued reports and recordings locally until they are sent or deleted. CBS stores and scans audio using the private evidence workflow. Offline reporting requires a supported browser and a prepared page. Highly restricted safety reports require an online connection. Use local emergency services for immediate danger.'], commands: ['submitCase', 'caseNote'],
   },
   {
+    id: 'reporting-desk', title: 'Kaduna South community reporting desk', icon: 'community', audience: 'Residents and authorized facilitators', route: '/desk',
+    summary: 'An authorized facilitator can help a resident submit an ordinary written or voice report with the resident’s permission.',
+    steps: [
+      'A resident with verified membership in a Kaduna South community signs in and opens Community reporting desk.',
+      'The resident selects their community, authorizes one report, and separately chooses whether to permit a private voice attachment. They create a one-time code and share it only with the facilitator. It expires after 30 minutes.',
+      'The facilitator signs in using their own account with an active Kaduna South desk grant, enters the code, and types or records the report. Read the details back to the resident before sending.',
+      'Give the case reference to the resident after CBS accepts the report. The resident can follow the case under Cases & reports. If the voice upload fails, keep the desk page open and retry the attachment using the receipt.',
+    ],
+    questions: [
+      { question: 'Who can use the Kaduna South desk?', answer: 'Residents need a CBS account with verified Kaduna South community membership. Facilitators need an operator-issued, time-limited desk grant. A coordinator or platform administrator needs a desk grant to submit as a facilitator.' },
+      { question: 'Who can read an assisted report?', answer: 'The case belongs to the resident and follows normal case access rules. Desk access lets the submitting facilitator attach the single consented recording. It does not give the facilitator access to browse the case or download the recording.' },
+      { question: 'Can I use a code twice or report offline at the desk?', answer: 'Each code authorizes one report. A retry of the same submission returns its original case reference. The desk requires an internet connection and keeps recordings in the open page until upload.' },
+    ],
+    notes: ['The pilot is limited to Kaduna South and ordinary reports. Use the restricted channels for safety or conduct concerns. Audio uses the existing private evidence scanner. Hosted audio upload still requires storage verification.'],
+    commands: ['createDeskConsent','submitDeskCase'],
+  },
+  {
     id: 'investigation', title: 'Triage, investigation & outcome review', icon: 'shield', audience: 'Authorized handlers & reviewers', route: '/cases',
     summary: 'Ordinary reports move through explicit server-controlled states. A proposed outcome, an independent verification, and final closure are separate actions.',
     steps: [

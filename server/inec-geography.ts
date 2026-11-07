@@ -24,6 +24,7 @@ const stateIds = new Map(states.map(state => [
   state.code,
   fixedId('state-' + (state.name === 'FCT' ? 'Federal Capital Territory' : state.name.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase()))),
 ]));
+export const KADUNA_SOUTH_ID=fixedId('inec-lga-18-10');
 const lgaKey = (state: string, lga: string) => 'inec-lga-' + state + '-' + lga;
 const catalog = [
   ...lgas.map(row => location(lgaKey(row.state_code, row.code), row.name, 'LGA', stateIds.get(row.state_code)!)),

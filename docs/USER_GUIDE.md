@@ -136,6 +136,24 @@ Current boundary: Use a trusted device. The browser retains queued reports and r
 
 Open in CBS: /cases
 
+## Kaduna South community reporting desk
+
+Audience: Residents and authorized facilitators
+
+An authorized facilitator can help a resident submit an ordinary written or voice report with the resident’s permission.
+
+1. A resident with verified membership in a Kaduna South community signs in and opens Community reporting desk.
+
+2. The resident selects their community, authorizes one report, and separately chooses whether to permit a private voice attachment. They create a one-time code and share it only with the facilitator. It expires after 30 minutes.
+
+3. The facilitator signs in using their own account with an active Kaduna South desk grant, enters the code, and types or records the report. Read the details back to the resident before sending.
+
+4. Give the case reference to the resident after CBS accepts the report. The resident can follow the case under Cases & reports. If the voice upload fails, keep the desk page open and retry the attachment using the receipt.
+
+Current boundary: The pilot is limited to Kaduna South and ordinary reports. Use the restricted channels for safety or conduct concerns. Audio uses the existing private evidence scanner. Hosted audio upload still requires storage verification.
+
+Open in CBS: /desk
+
 ## Triage, investigation & outcome review
 
 Audience: Authorized handlers & reviewers

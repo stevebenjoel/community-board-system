@@ -1,10 +1,12 @@
 import { config } from '../server/config.ts';
 import { appwrite, createStore } from '../server/store.ts';
 import { appendAudit } from '../server/domain.ts';
+import { KADUNA_SOUTH_ID } from '../server/inec-geography.ts';
 import { assert } from '../server/policy.ts';
 const [userId,jurisdiction,role,authority,expiresAt]=process.argv.slice(2);
 assert(config.CBS_MODE==='appwrite','Bootstrap grants are only for Appwrite mode.');
-assert(userId&&jurisdiction&&['LGA_COORDINATOR','ETHICS_REVIEWER','PLATFORM_ADMIN','AUDITOR','SECURITY_HANDLER'].includes(role)&&authority?.length>=10&&expiresAt&&new Date(expiresAt)>new Date(),'Usage: pnpm admin:grant <userId> <jurisdictionId> <role> <approved-authority-reference> <ISO-expiry>');
+assert(userId&&jurisdiction&&['LGA_COORDINATOR','ETHICS_REVIEWER','PLATFORM_ADMIN','AUDITOR','SECURITY_HANDLER','DESK_FACILITATOR'].includes(role)&&authority?.length>=10&&expiresAt&&new Date(expiresAt)>new Date(),'Usage: pnpm admin:grant <userId> <jurisdictionId> <role> <approved-authority-reference> <ISO-expiry>');
+assert(role!=='DESK_FACILITATOR'||jurisdiction===KADUNA_SOUTH_ID,'Desk facilitators are limited to Kaduna South.');
 const account=await appwrite(`/users/${encodeURIComponent(userId)}`);
 assert(config.CBS_TESTING_MODE||((account.emailVerification||account.phoneVerification)&&account.mfa),'Bootstrap recipient must have verified contact and MFA enabled.');
-const store=createStore();await store.transaction(s=>{const user=s.users.find(u=>u.id===userId);assert(user,'User must sign in to CBS first.');assert(s.geos.some(g=>g.id===jurisdiction),'Unknown jurisdiction.');user.grants.push({role:role as 'LGA_COORDINATOR',jurisdiction,startsAt:new Date().toISOString(),endsAt:new Date(expiresAt).toISOString()});appendAudit(s,{id:'operator-bootstrap',name:'Operator',email:'',verified:true,mfa:true},`grant.${role}.${authority}`,userId,jurisdiction);});store.close();console.log('Approved scoped grant recorded.');
+const store=createStore();await store.transaction(s=>{const user=s.users.find(u=>u.id===userId);assert(user,'User must sign in to CBS first.');assert(s.geos.some(g=>g.id===jurisdiction),'Unknown jurisdiction.');user.grants.push({role:role as import('../shared/model.ts').Role,jurisdiction,startsAt:new Date().toISOString(),endsAt:new Date(expiresAt).toISOString()});appendAudit(s,{id:'operator-bootstrap',name:'Operator',email:'',verified:true,mfa:true},`grant.${role}.${authority}`,userId,jurisdiction);});store.close();console.log('Approved scoped grant recorded.');

@@ -142,6 +142,22 @@ Choose the state or FCT, LGA or area council, and ward inside the form. The Comm
 
 Full workflow: /documentation#guide-cases
 
+## Kaduna South community reporting desk
+
+### Who can use the Kaduna South desk?
+
+Residents need a CBS account with verified Kaduna South community membership. Facilitators need an operator-issued, time-limited desk grant. A coordinator or platform administrator needs a desk grant to submit as a facilitator.
+
+### Who can read an assisted report?
+
+The case belongs to the resident and follows normal case access rules. Desk access lets the submitting facilitator attach the single consented recording. It does not give the facilitator access to browse the case or download the recording.
+
+### Can I use a code twice or report offline at the desk?
+
+Each code authorizes one report. A retry of the same submission returns its original case reference. The desk requires an internet connection and keeps recordings in the open page until upload.
+
+Full workflow: /documentation#guide-reporting-desk
+
 ## Triage, investigation & outcome review
 
 ### Does “In progress” mean the problem has been fixed?

@@ -16,7 +16,7 @@ export async function request<T>(path:string,payload?:unknown):Promise<T>{
   const value=await response.json();if(!response.ok)throw new Error(value.error?.message??'The service is unavailable. Please retry.');return value as T;
 }
 export const getWorkspace=()=>request<Workspace>('/workspace');
-export const command=(action:string,payload:unknown)=>request<{id:string}>('/commands',{action,payload});
+export const command=(action:string,payload:unknown)=>request<{id:string;code?:string;reference?:string}>('/commands',{action,payload});
 export const demoSignIn=(userId:string)=>request('/demo-session',{userId});
 export async function signOut(){if(account)await account.deleteSession({sessionId:'current'});await request('/logout',{});await clearSetup().catch(()=>{});}
 export async function login(email:string,password:string){if(!account)throw new Error('Choose a synthetic profile in the local pilot.');await account.createEmailPasswordSession({email,password});await request('/session',{});}

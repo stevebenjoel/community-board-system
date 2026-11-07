@@ -66,7 +66,7 @@ export function caseOfficer(s: State, p: Principal, c: Case): void {
 }
 export function canUseEvidenceTarget(s:State,p:Principal|null,type:'CASE'|'PROJECT',id:string,write=false):boolean {
   if(!p||!contactAllowed(p))return false;
-  if(type==='CASE'){const c=s.cases.find(c=>c.id===id);return !!c&&canReadCase(s,p,c);}
+  if(type==='CASE'){const c=s.cases.find(c=>c.id===id);return !!c&&(canReadCase(s,p,c)||(write&&c.desk?.voice===true&&c.desk.facilitatorId===p.id&&has(s,p,['DESK_FACILITATOR'],c.jurisdiction)));}
   const project=s.projects.find(x=>x.id===id);if(!project||restricted(s,p.id,id))return false;
   const roles:Role[]=write?['LGA_COORDINATOR','BOARD_CHAIR','BOARD_SECRETARY','BOARD_MEMBER']:['LGA_COORDINATOR','BOARD_CHAIR','BOARD_SECRETARY','BOARD_MEMBER','AUDITOR'];
   return has(s,p,roles,project.jurisdiction)||s.boards.some(b=>b.code===project.boardCode&&inScope(s,b.jurisdiction,project.jurisdiction)&&has(s,p,roles,project.jurisdiction,b.id));

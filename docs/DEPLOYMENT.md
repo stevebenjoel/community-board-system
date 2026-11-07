@@ -58,6 +58,8 @@ Selected-addition deployment: see ADDITIONS_GUIDE.md. Add Appwrite Storage bucke
 
 Voice reporting requires HTTPS on the hosted site and an Appwrite evidence bucket that permits M4A and WebM. Apply the updated database migration with the provisioning key before deploying the browser workflow. The runtime key must also be able to read the evidence bucket metadata for the existing private-storage policy check. Verify a real recording upload and malware scan on the hosted site. For local offline testing, use the built app served by CBS on loopback so the service worker can cache the compiled files.
 
+To activate the Kaduna South reporting desk, use the operator provisioning credential with the existing admin:grant script. Supply the approved facilitator’s CBS account ID, the Kaduna South LGA ID from the registry, the DESK_FACILITATOR role, an authority reference, and an expiry. The account must have signed in to CBS. Keep the operator credential in the provisioning process and use the separate runtime key for the deployed server.
+
 ## Connected Appwrite project
 
 Temporary password-only testing is controlled by CBS_TESTING_MODE. The Compose file defaults it to true for the owner's requested testing period. New registration skips verification email delivery, member actions accept unverified contact, and scoped officer actions accept single-factor sessions. Appwrite's recorded contact verification and session factors remain accurate. Set CBS_TESTING_MODE=false in Coolify and redeploy to restore the app's email and MFA requirements. Appwrite account-level MFA enrollment remains a separate setting.

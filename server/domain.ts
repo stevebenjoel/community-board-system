@@ -4,7 +4,7 @@ import { BOARD_TYPES, type Appointment, type Base, type Case, type CaseStatus, t
 import { contactAllowed, activeGrant, assert, boardFor, canReadCase, caseOfficer, has, inScope, requireRole, restricted, userFor } from './policy.ts';
 import { canUseEvidenceTarget } from './policy.ts';
 import { actionItems } from './reminders.ts';
-import { includeSettlement } from './inec-geography.ts';
+import { includeSettlement,KADUNA_SOUTH_ID } from './inec-geography.ts';
 import { config } from './config.ts';
 import { tours } from '../shared/tours.ts';
 
@@ -26,6 +26,11 @@ export const commands = {
   revokeAppointment: z.object({ id, reason: str(10) }).strict(),
   conflict: z.object({ boardId: id, matterId: id, description: str(10) }).strict(),
   reviewConflict: z.object({ id, restrict: z.boolean(), reason: str(10) }).strict(),
+  createDeskConsent: z.object({jurisdiction:id,voice:z.boolean(),consent:z.literal(true)}).strict(),
+  submitDeskCase: z.object({
+    code:z.uuid(),clientRequestId:z.uuid(),category:z.enum(['EDU','HLT','INF','TRD','YTH','CUL','GENERAL']),
+    title:str(5,160),description:str(20,10000),location:str(0,500),urgency:z.enum(['NORMAL','HIGH','URGENT']),voice:z.boolean(),
+  }).strict(),
   submitCase: z.object({ expectedReporterId: id.optional(), category: z.enum(['EDU','HLT','SEC','INF','TRD','YTH','CUL','GENERAL','CONDUCT']), title: str(5,160), description: str(20,10000), jurisdiction: id, location: str(0,500), urgency: z.enum(['NORMAL','HIGH','URGENT']), clientRequestId: z.uuid() }).strict(),
   caseTransition: z.object({ id, status: z.enum(['INTAKE_REVIEW','NEEDS_INFORMATION','ACCEPTED','ASSIGNED','IN_PROGRESS','REFERRED','OUTCOME_PROPOSED','VERIFICATION','CLOSED','APPEALED','REOPENED','REJECTED_WITH_REASONS','DUPLICATE_LINKED']), note: str(10,5000), evidence: str(0,1000).default(''), duplicateId: str(0,100).default('') }).strict(),
   assignCase: z.object({ id, boardId: id, assigneeId: id }).strict(),
@@ -123,13 +128,47 @@ function recipientAccess(s: State,p: Principal|null,agency: State['agencies'][nu
 }
 
 // Each caller runs this function within a repository transaction, including the audit and notifications.
-export function execute(s: State,p: Principal,action: Action,input: unknown): { id: string } {
+export function execute(s: State,p: Principal,action: Action,input: unknown): { id: string; code?:string; reference?:string } {
   assert(Object.hasOwn(commands,action),'Unknown command.');
   const me=userFor(s,p);
   let entityId=me.id, jurisdiction=s.geos.find(x=>x.type==='COUNTRY')?.id ?? '';
   const read=<K extends Action>(name: K): z.output<(typeof commands)[K]> => commands[name].parse(input) as z.output<(typeof commands)[K]>;
   const now=new Date().toISOString();
   switch(action) {
+    case 'createDeskConsent': {
+      const d=read(action);
+      includeSettlement(s,d.jurisdiction);
+      assert(contactAllowed(p)&&inScope(s,KADUNA_SOUTH_ID,d.jurisdiction)&&s.residencies.some(r=>r.userId===p.id&&r.jurisdiction===d.jurisdiction&&r.status==='VERIFIED'),'A verified Kaduna South community membership is required.');
+      const code=randomUUID();
+      const consent={...stamp(),residentId:p.id,jurisdiction:d.jurisdiction,voice:d.voice,digest:createHash('sha256').update(code).digest('hex'),expiresAt:new Date(Date.now()+30*60000).toISOString()};
+      s.deskConsents.push(consent);
+      appendAudit(s,p,action,consent.id,d.jurisdiction);
+      return {id:consent.id,code};
+    }
+    case 'submitDeskCase': {
+      const {code,voice,...d}=read(action);
+      const digest=createHash('sha256').update(code).digest('hex');
+      const consent=s.deskConsents.find(item=>item.digest===digest);
+      assert(consent&&consent.residentId!==p.id,'A valid consent code from a different resident is required.','ACCESS_DENIED',403);
+      requireRole(s,p,['DESK_FACILITATOR'],consent.jurisdiction);
+      assert(inScope(s,KADUNA_SOUTH_ID,consent.jurisdiction),'Reporting desks are limited to Kaduna South.','ACCESS_DENIED',403);
+      if(consent.caseId){
+        const prior=find(s.cases,consent.caseId);
+        assert(prior.desk?.facilitatorId===p.id&&prior.clientRequestId===d.clientRequestId,'This consent code has already been used.');
+        return {id:prior.id,reference:prior.reference};
+      }
+      assert(consent.expiresAt>now,'The consent code has expired.');
+      assert(!voice||consent.voice,'The resident must consent to a voice recording.');
+      assert(s.residencies.some(r=>r.userId===consent.residentId&&r.jurisdiction===consent.jurisdiction&&r.status==='VERIFIED'),'The resident must have verified membership in this community.');
+      const c:Case={...stamp(),...d,jurisdiction:consent.jurisdiction,reporterId:consent.residentId,boardCode:d.category,
+        reference:'CBS-'+new Date().getUTCFullYear()+'-'+randomUUID().slice(0,8).toUpperCase(),classification:'CONFIDENTIAL',status:'SUBMITTED',events:[],
+        desk:{facilitatorId:p.id,consentId:consent.id,voice}};
+      event(c,p,'SUBMITTED','Report submitted at a community reporting desk with resident consent.');
+      s.cases.push(c);consent.caseId=c.id;consent.updatedAt=now;
+      notify(s,c.reporterId,'Your community desk report has been received.','/cases');
+      appendAudit(s,p,action,c.id,c.jurisdiction);
+      return {id:c.id,reference:c.reference};
+    }
     case 'setProjectMedia': {
       const d=read(action),file=find(s.evidence,d.id);
       assert(file.targetType==='PROJECT','Case attachments are private.','ACCESS_DENIED',403);
@@ -464,6 +503,9 @@ export function workspace(s: State,p: Principal|null,mode: 'synthetic'|'appwrite
       const c=find(s.cases,r.caseId),agency=find(s.agencies,r.agencyId);
       return (p?.id!==c.reporterId&&canReadCase(s,p,c))||(r.recipientId===p?.id&&recipientAccess(s,p,agency,c.jurisdiction)&&!restricted(s,p.id,c.id));
     }).map(r=>cases.some(c=>c.id===r.caseId)?r:{...r,caseId:'',recordedBy:'',responses:r.responses?.map(response=>({...response,followUps:undefined}))}),
+    deskConsents:[],
+    deskFacilitator:has(s,p,['DESK_FACILITATOR'],KADUNA_SOUTH_ID),
+    deskCommunityIds:s.residencies.filter(r=>p&&contactAllowed(p)&&r.userId===p.id&&r.status==='VERIFIED'&&inScope(s,KADUNA_SOUTH_ID,r.jurisdiction)).map(r=>r.jurisdiction),
     me,mode,testingMode:config.CBS_TESTING_MODE,boardTypes:BOARD_TYPES,demoProfiles:mode==='synthetic'?s.users.filter(u=>u.synthetic).map(u=>({id:u.id,name:u.name,role:u.grants[0]?.role??'RESIDENT'})):[],
     users,geos:s.geos,residencies:s.residencies.filter(r=>r.userId===p?.id||scoped(r.jurisdiction)),boards,
     evidence:s.evidence.filter(e=>canUseEvidenceTarget(s,p,e.targetType,e.targetId)),actionItems:actionItems(s,p),

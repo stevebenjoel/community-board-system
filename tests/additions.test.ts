@@ -205,3 +205,37 @@ test('public progress clips require independent release and become inaccessible 
   await store.transaction(s=>execute(s,actor('coordinator'),'setProjectMedia',{id:publicFile.id}));
   await assert.rejects(service.publicMedia(publicFile.id),/not found/i);
 });
+import { addInecGeography,includeSettlement,KADUNA_SOUTH_ID,wardSettlements } from '../server/inec-geography.ts';
+
+test('Kaduna South desk consent is single use, scoped and allows only the private voice attachment',async t=>{
+  const state=addInecGeography(syntheticSeed());
+  const settlement=state.geos.filter(geo=>geo.parentId===KADUNA_SOUTH_ID&&geo.type==='WARD')
+    .flatMap(ward=>wardSettlements(state,ward.id))[0];
+  assert(settlement);
+  includeSettlement(state,settlement.id);
+  const resident=actor('resident'),facilitator=actor('monitor');
+  state.residencies.push({...state.residencies[0],id:randomUUID(),userId:resident.id,jurisdiction:settlement.id,status:'VERIFIED'});
+  const grant={role:'DESK_FACILITATOR' as const,jurisdiction:KADUNA_SOUTH_ID,startsAt:'2020-01-01T00:00:00.000Z',endsAt:'2099-01-01T00:00:00.000Z'};
+  state.users.find(user=>user.id===facilitator.id)!.grants.push(grant);
+  assert.throws(()=>execute(state,resident,'createDeskConsent',{jurisdiction:ids.community,voice:true,consent:true}),/Kaduna South/);
+  const {code}=execute(state,resident,'createDeskConsent',{jurisdiction:settlement.id,voice:true,consent:true});
+  assert(code);
+  assert.equal(workspace(state,null,'synthetic').deskConsents.length,0);
+  const payload={code,clientRequestId:randomUUID(),title:'Assisted voice report',category:'INF',description:'The resident provided an audio report at a desk.',location:'',urgency:'NORMAL',voice:true};
+  assert.throws(()=>execute(state,actor('coordinator'),'submitDeskCase',payload),/requires an active/);
+  const receipt=execute(state,facilitator,'submitDeskCase',payload);
+  assert.equal(execute(state,facilitator,'submitDeskCase',payload).id,receipt.id);
+  assert.throws(()=>execute(state,facilitator,'submitDeskCase',{...payload,clientRequestId:randomUUID()}),/already been used/);
+  assert(workspace(state,resident,'synthetic').cases.some(c=>c.id===receipt.id));
+  assert(!workspace(state,facilitator,'synthetic').cases.some(c=>c.id===receipt.id));
+  const store=new SqliteStore(':memory:');t.after(()=>store.close());
+  await store.transaction(s=>Object.assign(s,state));
+  const service=new EvidenceService(store,undefined,async()=>({status:'CLEAN',engine:'test-fixture-scanner'}));
+  const mp4=Buffer.from('00000018667479706d703432000000006d70343269736f6d','hex');
+  const recording={targetType:'CASE' as const,targetId:receipt.id,filename:'voice-report.m4a',mime:'audio/mp4' as const,contentBase64:mp4.toString('base64'),clientRequestId:payload.clientRequestId};
+  await assert.rejects(service.upload(facilitator,{...recording,clientRequestId:randomUUID()}),/consented voice attachment/);
+  const audio=await service.upload(facilitator,recording);
+  assert.equal(audio.uploadStatus,'STORED');
+  await assert.rejects(service.token(facilitator,audio.id),/outside your permissions/);
+  assert((await service.token(resident,audio.id)).token);
+});
