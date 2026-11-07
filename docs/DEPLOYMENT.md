@@ -56,6 +56,8 @@ Reference: [Coolify Dockerfile applications](https://coolify.io/docs/application
 
 Selected-addition deployment: see ADDITIONS_GUIDE.md. Add Appwrite Storage bucket/file permissions to appropriately separated migration/runtime keys, configure APPWRITE_EVIDENCE_BUCKET_ID and an internal CBS_CLAMAV_HOST:3310 service, and allow at least 6 MiB proxy request bodies while retaining the gateway's 4 MiB decoded limit. The API's default 15-minute reminder cycle requires uptime monitoring. The Compose template includes ClamAV but has not been executed here.
 
+Voice reporting requires HTTPS on the hosted site and an Appwrite evidence bucket that permits M4A and WebM. Apply the updated database migration with the provisioning key before deploying the browser workflow. The runtime key must also be able to read the evidence bucket metadata for the existing private-storage policy check. Verify a real recording upload and malware scan on the hosted site. For local offline testing, use the built app served by CBS on loopback so the service worker can cache the compiled files.
+
 ## Connected Appwrite project
 
 Temporary password-only testing is controlled by CBS_TESTING_MODE. The Compose file defaults it to true for the owner's requested testing period. New registration skips verification email delivery, member actions accept unverified contact, and scoped officer actions accept single-factor sessions. Appwrite's recorded contact verification and session factors remain accurate. Set CBS_TESTING_MODE=false in Coolify and redeploy to restore the app's email and MFA requirements. Appwrite account-level MFA enrollment remains a separate setting.

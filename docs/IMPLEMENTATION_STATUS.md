@@ -1,5 +1,7 @@
 # Implementation status — 3 November 2026
 
+On 7 November 2026, a built loopback preview verified the guided report workflow in Chromium with a simulated microphone. A voice-only report survived reopening and reloading the prepared page while offline. Reconnection created one case and one private recording. The browser keeps the chosen offline community and pending reports in private IndexedDB. The service worker caches public application files. Hosted Appwrite audio storage and live microphone behavior on target phones still require verification.
+
 On 6 November 2026, the public website health and configuration endpoints confirmed Appwrite mode, and the authentication endpoint allowed the communityboardsystem.org browser origin. The registration page now covers account creation, sign-in, recovery, email verification and resend, and the handoff to community membership. Email delivery and a real resident-to-coordinator approval journey still require hosted acceptance testing.
 
 The board review inbox uses server-calculated eligibility. Formal minutes and resolution amendments preserve the source text and require a separate approver. Scoped agency referrals support independent coordinator verification and in-app acknowledgement by the designated recipient.

@@ -8,7 +8,7 @@ import { assert,canUseEvidenceTarget } from './policy.ts';
 import { appendAudit,isPublicProjectMedia } from './domain.ts';
 
 export const MAX_EVIDENCE_BYTES=4*1024*1024;
-export const uploadSchema=z.object({targetType:z.enum(['CASE','PROJECT']),targetId:z.string().min(1).max(100),filename:z.string().min(1).max(180),mime:z.enum(['image/png','image/jpeg','application/pdf','video/mp4']),contentBase64:z.string().min(4).max(Math.ceil(MAX_EVIDENCE_BYTES/3)*4),clientRequestId:z.uuid()}).strict();
+export const uploadSchema=z.object({targetType:z.enum(['CASE','PROJECT']),targetId:z.string().min(1).max(100),filename:z.string().min(1).max(180),mime:z.enum(['image/png','image/jpeg','application/pdf','video/mp4','audio/mp4','audio/webm']),contentBase64:z.string().min(4).max(Math.ceil(MAX_EVIDENCE_BYTES/3)*4),clientRequestId:z.uuid(),expectedUploaderId:z.string().min(1).max(100).optional()}).strict();
 export type UploadInput=z.infer<typeof uploadSchema>;
 export interface EvidenceStorage { put(id:string,bytes:Buffer,filename:string,mime:string):Promise<void>;get(id:string):Promise<Buffer> }
 export interface ScanResult {status:Evidence['scanStatus'];engine:string}
@@ -24,7 +24,8 @@ export function validateFile(input:UploadInput){
   const png=bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])),jpeg=bytes[0]===255&&bytes[1]===216&&bytes[2]===255,pdf=bytes.subarray(0,5).toString()==='%PDF-';
   const filename=safeFilename(input.filename),extension=filename.split('.').at(-1)?.toLowerCase();
   const mp4=bytes.length>=16&&bytes.toString('ascii',4,8)==='ftyp'&&bytes.readUInt32BE(0)>=16&&bytes.readUInt32BE(0)<=bytes.length;
-  assert((input.mime==='video/mp4'&&mp4&&extension==='mp4')||(input.mime==='image/png'&&png&&extension==='png')||(input.mime==='image/jpeg'&&jpeg&&['jpg','jpeg'].includes(extension??''))||(input.mime==='application/pdf'&&pdf&&extension==='pdf'),'File extension, declared type, and file signature must match.','FILE_TYPE');
+  const webm=bytes.length>=8&&bytes.readUInt32BE(0)===0x1a45dfa3&&bytes.subarray(4,128).includes(Buffer.from('webm'));
+  assert((input.mime==='audio/mp4'&&mp4&&extension==='m4a')||(input.mime==='audio/webm'&&webm&&extension==='webm')||(input.mime==='video/mp4'&&mp4&&extension==='mp4')||(input.mime==='image/png'&&png&&extension==='png')||(input.mime==='image/jpeg'&&jpeg&&['jpg','jpeg'].includes(extension??''))||(input.mime==='application/pdf'&&pdf&&extension==='pdf'),'File extension, declared type, and file signature must match.','FILE_TYPE');
   return {bytes,filename,sha256:digest(bytes)};
 }
 export function canReadEvidence(s:State,p:Principal|null,e:Evidence){return canUseEvidenceTarget(s,p,e.targetType,e.targetId);}
@@ -67,6 +68,7 @@ export class EvidenceService {
   private authorized(s:State,p:Principal,id:string){const e=s.evidence.find(e=>e.id===id);assert(e&&canReadEvidence(s,p,e),'Evidence is unavailable or outside your permissions.','ACCESS_DENIED',403);return e;}
   async upload(p:Principal,raw:unknown){
     const input=uploadSchema.parse(raw),file=validateFile(input);
+    assert(!input.expectedUploaderId||input.expectedUploaderId===p.id,'Sign in to the account that recorded this attachment.','ACCESS_DENIED',403);
     const fileId=createHash('sha256').update(`${p.id}:${input.clientRequestId}`).digest('hex').slice(0,32);
     const reserved=await this.store.transaction(s=>{
       assert(canUseEvidenceTarget(s,p,input.targetType,input.targetId,true),'You cannot attach evidence to this record.','ACCESS_DENIED',403);

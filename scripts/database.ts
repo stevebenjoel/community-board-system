@@ -22,7 +22,7 @@ if(operation==='migrate'&&config.CBS_MODE==='appwrite'){
   for(const key of ['kind','ordinal'])await tolerateConflict(`${root}/cbs_records/indexes`,'POST',{key,type:'key',columns:[key],orders:['ASC']});
   await tolerateConflict(`${root}/cbs_control/rows`,'POST',{rowId:'revision',data:{revision:0},permissions:[]});
   for(const b of boardDefinitions)await tolerateConflict(`${root}/cbs_board_types/rows`,'POST',{rowId:b.code,data:{code:b.code,name:b.name,description:b.description},permissions:[]});
-  const bucket={name:'CBS private evidence',permissions:[],fileSecurity:true,enabled:true,maximumFileSize:4194304,allowedFileExtensions:['png','jpg','jpeg','pdf','mp4'],compression:'none',encryption:true,antivirus:true};
+  const bucket={name:'CBS private evidence',permissions:[],fileSecurity:true,enabled:true,maximumFileSize:4194304,allowedFileExtensions:['png','jpg','jpeg','pdf','mp4','m4a','webm'],compression:'none',encryption:true,antivirus:true};
   await tolerateConflict('/storage/buckets','POST',{bucketId:config.APPWRITE_EVIDENCE_BUCKET_ID,...bucket});
   await appwrite(`/storage/buckets/${config.APPWRITE_EVIDENCE_BUCKET_ID}`,'PUT',bucket);
   console.log('Appwrite schema migration submitted. Confirm indexes are available in the console before serving traffic.');

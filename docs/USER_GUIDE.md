@@ -118,19 +118,21 @@ Audience: Residents
 
 A case is a confidential, traceable record. The resident sees its status and citizen-visible updates, while internal investigation notes remain restricted.
 
-1. Inside Report a community issue, select a state/FCT, LGA and ward to load Community / Settlement options. Wait for the community list to load before submitting. Saved report drafts retain these location selections.
+1. Sign in and choose Report an issue. Select a board and describe what happened. Choose Speak to fill the form where your browser supports dictation, or record a voice report of up to 90 seconds. Dictation continues through short pauses. Select Stop dictation when finished and review the text.
 
-2. Choose Report an issue. Select the relevant board/category, add a 5–160 character title and a 20–10,000 character factual description, choose the community, and optionally add a landmark.
+2. While connected, choose a community for offline use. Select your state/FCT, LGA, ward and community, then choose Prepare this device for offline reporting. Bookmark the reporting page and reopen it on the same browser when offline.
 
-3. Set urgency and submit. The app shows success only after the server commits the report. The case receives a generated reference and a submission event.
+3. Choose the community and optionally add a landmark. While offline, the form uses the community saved on this device. Select urgency, then send or save the report for later.
 
-4. For an ordinary report, Save draft retains a per-account draft in this browser tab. A saved draft has not been submitted; safety reports cannot use browser draft storage.
+4. Reopen the reporting page with a connection and the same account to send queued reports. If a transfer stops, choose Retry sending. Received by CBS confirms the case was recorded. A recording can still be pending as a separate attachment.
 
-5. Open Cases & reports and select the record to follow its history. Add information through the case detail page when you have further facts.
+5. Use Open detailed or confidential safety reporting for the full online form. Its Save draft action retains an ordinary report in the current browser tab. Safety reports require the online form and cannot be saved as browser drafts.
 
-6. When a case is closed, rejected with reasons, or linked as a duplicate, the reporter can request an appeal from the detail page. Reopening requires an authorized review.
+6. Open Cases & reports and select the record to follow its history. Add information through the case detail page when you have further facts.
 
-Current boundary: Highly restricted safety cases have tighter handler controls. Use only the minimum necessary information, and never rely on CBS for live emergency response.
+7. When a case is closed, rejected with reasons, or linked as a duplicate, the reporter can request an appeal from the detail page. Reopening requires an authorized review.
+
+Current boundary: Use a trusted device. The browser retains queued reports and recordings locally until they are sent or deleted. CBS stores and scans audio using the private evidence workflow. Offline reporting requires a supported browser and a prepared page. Highly restricted safety reports require an online connection. Use local emergency services for immediate danger.
 
 Open in CBS: /cases
 

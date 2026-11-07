@@ -26,7 +26,7 @@ export const commands = {
   revokeAppointment: z.object({ id, reason: str(10) }).strict(),
   conflict: z.object({ boardId: id, matterId: id, description: str(10) }).strict(),
   reviewConflict: z.object({ id, restrict: z.boolean(), reason: str(10) }).strict(),
-  submitCase: z.object({ category: z.enum(['EDU','HLT','SEC','INF','TRD','YTH','CUL','GENERAL','CONDUCT']), title: str(5,160), description: str(20,10000), jurisdiction: id, location: str(0,500), urgency: z.enum(['NORMAL','HIGH','URGENT']), clientRequestId: z.uuid() }).strict(),
+  submitCase: z.object({ expectedReporterId: id.optional(), category: z.enum(['EDU','HLT','SEC','INF','TRD','YTH','CUL','GENERAL','CONDUCT']), title: str(5,160), description: str(20,10000), jurisdiction: id, location: str(0,500), urgency: z.enum(['NORMAL','HIGH','URGENT']), clientRequestId: z.uuid() }).strict(),
   caseTransition: z.object({ id, status: z.enum(['INTAKE_REVIEW','NEEDS_INFORMATION','ACCEPTED','ASSIGNED','IN_PROGRESS','REFERRED','OUTCOME_PROPOSED','VERIFICATION','CLOSED','APPEALED','REOPENED','REJECTED_WITH_REASONS','DUPLICATE_LINKED']), note: str(10,5000), evidence: str(0,1000).default(''), duplicateId: str(0,100).default('') }).strict(),
   assignCase: z.object({ id, boardId: id, assigneeId: id }).strict(),
   caseNote: z.object({ id, note: str(5,5000), internal: z.boolean() }).strict(),
@@ -328,7 +328,9 @@ export function execute(s: State,p: Principal,action: Action,input: unknown): { 
     case 'conflict': {const d=read(action),b=boardFor(s,d.boardId);requireRole(s,p,monitors,b.jurisdiction,b.id);const c={...stamp(),...d,userId:p.id,status:'PENDING'};s.conflicts.push(c);entityId=c.id;jurisdiction=b.jurisdiction;break;}
     case 'reviewConflict': {const d=read(action),c=find(s.conflicts,d.id),b=boardFor(s,c.boardId);requireRole(s,p,['ETHICS_REVIEWER'],b.jurisdiction);assert(c.userId!==p.id,'Independent conflict review required.');assert(c.status==='PENDING','Conflict already reviewed.');c.status=d.restrict?'RESTRICTED':'CLEARED';c.reviewerId=p.id;entityId=c.id;jurisdiction=b.jurisdiction;break;}
     case 'submitCase': {
-      const d=read(action);assert(contactAllowed(p),'Verify your contact before submitting a report.','CONTACT_VERIFICATION_REQUIRED',403);
+      const {expectedReporterId,...d}=read(action);
+      assert(!expectedReporterId||expectedReporterId===p.id,'Sign in to the account that saved this report.','ACCESS_DENIED',403);
+      assert(contactAllowed(p),'Verify your contact before submitting a report.','CONTACT_VERIFICATION_REQUIRED',403);
       includeSettlement(s,d.jurisdiction);
       assert(s.geos.some(g=>g.id===d.jurisdiction && g.type==='COMMUNITY'),'Select a registered community.');
       const prior=s.cases.find(c=>c.reporterId===p.id && c.clientRequestId===d.clientRequestId);if(prior)return {id:prior.id};

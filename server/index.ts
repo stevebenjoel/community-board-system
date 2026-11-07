@@ -38,10 +38,10 @@ async function principal(req:IncomingMessage):Promise<Principal|null>{
   }catch{throw new DomainError('SESSION_INVALID','Your session expired. Please sign in again.',401);}
 }
 export async function handleRequest(req:IncomingMessage,res:ServerResponse){
-  const requestId=randomUUID();res.setHeader('X-Request-Id',requestId);res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
+  const requestId=randomUUID();res.setHeader('X-Request-Id',requestId);res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Permissions-Policy','camera=(), microphone=(self), geolocation=()');
   // Appwrite is contacted by the client only for identity. All CBS data stays behind this API.
   const authOrigin=config.APPWRITE_ENDPOINT?new URL(config.APPWRITE_ENDPOINT).origin:'';
-  if(config.NODE_ENV==='production')res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ${authOrigin}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
+  if(config.NODE_ENV==='production')res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self' blob:; connect-src 'self' ${authOrigin}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
   try{
     const url=new URL(req.url??'/',config.APP_ORIGIN),path=url.pathname;
     if(path==='/health'){send(res,200,{status:'ok',mode:config.CBS_MODE});return;}

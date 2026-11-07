@@ -117,21 +117,23 @@ export const helpTopics: HelpTopic[] = [
     id: 'cases', title: 'Report, track & appeal an issue', icon: 'cases', audience: 'Residents', route: '/cases',
     summary: 'A case is a confidential, traceable record. The resident sees its status and citizen-visible updates, while internal investigation notes remain restricted.',
     steps: [
-      'Inside Report a community issue, select a state/FCT, LGA and ward to load Community / Settlement options. Wait for the community list to load before submitting. Saved report drafts retain these location selections.',
-      'Choose Report an issue. Select the relevant board/category, add a 5–160 character title and a 20–10,000 character factual description, choose the community, and optionally add a landmark.',
-      'Set urgency and submit. The app shows success only after the server commits the report. The case receives a generated reference and a submission event.',
-      'For an ordinary report, Save draft retains a per-account draft in this browser tab. A saved draft has not been submitted; safety reports cannot use browser draft storage.',
+      'Sign in and choose Report an issue. Select a board and describe what happened. Choose Speak to fill the form where your browser supports dictation, or record a voice report of up to 90 seconds. Dictation continues through short pauses. Select Stop dictation when finished and review the text.',
+      'While connected, choose a community for offline use. Select your state/FCT, LGA, ward and community, then choose Prepare this device for offline reporting. Bookmark the reporting page and reopen it on the same browser when offline.',
+      'Choose the community and optionally add a landmark. While offline, the form uses the community saved on this device. Select urgency, then send or save the report for later.',
+      'Reopen the reporting page with a connection and the same account to send queued reports. If a transfer stops, choose Retry sending. Received by CBS confirms the case was recorded. A recording can still be pending as a separate attachment.',
+      'Use Open detailed or confidential safety reporting for the full online form. Its Save draft action retains an ordinary report in the current browser tab. Safety reports require the online form and cannot be saved as browser drafts.',
       'Open Cases & reports and select the record to follow its history. Add information through the case detail page when you have further facts.',
       'When a case is closed, rejected with reasons, or linked as a duplicate, the reporter can request an appeal from the detail page. Reopening requires an authorized review.',
     ],
     questions: [
       { question: 'Can other residents see my complaint?', answer: 'No. Current case narratives are not public. Your own records and authorized handlers’ records are filtered on the server. Internal notes are omitted from the reporter’s view.' },
-      { question: 'What if my connection drops during submission?', answer: 'Retry the same open submission. A stable request ID prevents duplicate creation if the first attempt already committed. Do not assume a report was received until the app confirms success.' },
-      { question: 'Where is my saved browser draft?', answer: 'Reopen Report an issue in the same tab and synthetic/account profile. Drafts are tab-scoped, are not official records, and are removed after confirmed submission. Closing the tab or clearing session storage can remove them.' },
+      { question: 'What if my connection drops during submission?', answer: 'The guided form saves a copy on this device before sending. Open the reporting page with the same signed-in account after reconnecting. A stable request ID prevents duplicate cases. Use Retry sending if needed.' },
+      { question: 'Where is my saved browser draft?', answer: 'The guided form shows queued reports under Saved on this device, including after closing and reopening a prepared offline page. You can delete a local copy there. Detailed-form drafts remain in the same tab and account.' },
+      { question: 'Can I report without typing or internet?', answer: 'Yes, after preparing the reporting page and community while connected. Allow microphone access and choose Record a voice report. A recording can stand in for written details. Dictation continues through short pauses until you select Stop dictation or the browser reports an error. It may need internet.' },
       { question: 'Can I attach photos or videos to a report?', answer: 'Yes. Open a submitted case or an authorized project and use Private evidence vault for PNG, JPEG, MP4 or PDF files up to 4 MiB. The server validates file type, stores a private attachment, and checks scanning status. If the scanner is unconfigured or unavailable, the file remains quarantined and cannot be downloaded. Live Appwrite Storage and ClamAV verification is still required before production use.' },
       { question: 'How do I select a community in the report form?', answer: 'Choose the state or FCT, LGA or area council, and ward inside the form. The Community / Settlement list loads the records for that ward. Your verified community is preselected when available. Changing an earlier selection clears the choices below it.' },
     ],
-    notes: ['Highly restricted safety cases have tighter handler controls. Use only the minimum necessary information, and never rely on CBS for live emergency response.'], commands: ['submitCase', 'caseNote'],
+    notes: ['Use a trusted device. The browser retains queued reports and recordings locally until they are sent or deleted. CBS stores and scans audio using the private evidence workflow. Offline reporting requires a supported browser and a prepared page. Highly restricted safety reports require an online connection. Use local emergency services for immediate danger.'], commands: ['submitCase', 'caseNote'],
   },
   {
     id: 'investigation', title: 'Triage, investigation & outcome review', icon: 'shield', audience: 'Authorized handlers & reviewers', route: '/cases',
@@ -337,6 +339,9 @@ export const helpTopics: HelpTopic[] = [
 
 export interface FeatureIdea { id: string; title: string; icon: string; benefit: string; scope: string; effort: string; request: string }
 export const featureIdeas: FeatureIdea[] = [
+  {id:'low-data-attachments',title:'Low-data attachments',icon:'cases',benefit:'Send photos with less mobile data.',scope:'Offer compressed photo uploads and show attachment progress.',effort:'Medium',request:'Add low-data photo uploads and attachment progress to reporting.'},
+  {id:'facilitator-reporting',title:'Assisted reporting',icon:'community',benefit:'Help residents who need support submitting a report.',scope:'Allow scoped facilitators to record a resident’s consent and submit on their behalf.',effort:'Medium',request:'Build consent-based assisted reporting for authorized facilitators.'},
+  {id:'offline-notices',title:'Offline community notices',icon:'resolutions',benefit:'Keep recent public meeting and service notices available during outages.',scope:'Cache approved public notices and show their last updated date.',effort:'Medium',request:'Add offline access to approved public community notices.'},
   {id:'review-threshold',title:'Board-specific review deadlines',icon:'cases',benefit:'Match reminders to the board’s review schedule.',scope:'Authorized coordinators set a waiting period for each board.',effort:'Small',request:'Add configurable board review escalation deadlines.'},
   {id:'amendment-highlights',title:'Amendment change highlights',icon:'resolutions',benefit:'Make changed wording easier to spot.',scope:'Highlight additions and removals in the comparison.',effort:'Small',request:'Add text change highlights to the amendment comparison.'},
   {id:'referral-filters',title:'Referral follow-up filters',icon:'trade',benefit:'Find agency responses still awaiting action.',scope:'Filter referrals by agency and follow-up status.',effort:'Small',request:'Add agency and follow-up filters to the referral page.'},

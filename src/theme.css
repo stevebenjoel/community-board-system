@@ -202,3 +202,4 @@
 .ward-selection{display:flex;flex-direction:column;align-items:flex-start;gap:9px;font-size:12px}.ward-selection>span{font-size:11px}
 .registration-panel{max-width:560px;margin-inline:auto}.registration-panel .form-fields input{width:100%}.registration-panel .form-fields p{line-height:1.7}
 .report-community{border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.report-community legend{font-weight:600;padding:0 5px}.report-community .geo-selects{margin:8px 0;gap:14px}.report-community select{width:100%}
+.report-flow{max-width:760px;margin-inline:auto;padding:clamp(16px,4vw,32px)}.report-flow h1{font-size:clamp(24px,5vw,36px)}.report-flow p,.report-flow small{line-height:1.7}.report-flow .button{min-height:44px}.voice-controls audio{display:block;max-width:100%;margin-top:12px}.voice-controls small{display:block;margin-top:10px}

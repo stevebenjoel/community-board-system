@@ -1,4 +1,5 @@
 import { Account, Client, ID, AuthenticationFactor, AuthenticatorType } from 'appwrite';
+import { clearSetup } from './reportQueue';
 import type { Workspace } from '../../shared/model';
 export interface RuntimeConfig { mode:'synthetic'|'appwrite'; testingMode:boolean; appwriteEndpoint:string; appwriteProjectId:string }
 let settings:RuntimeConfig;
@@ -17,7 +18,7 @@ export async function request<T>(path:string,payload?:unknown):Promise<T>{
 export const getWorkspace=()=>request<Workspace>('/workspace');
 export const command=(action:string,payload:unknown)=>request<{id:string}>('/commands',{action,payload});
 export const demoSignIn=(userId:string)=>request('/demo-session',{userId});
-export async function signOut(){if(account)await account.deleteSession({sessionId:'current'});await request('/logout',{});}
+export async function signOut(){if(account)await account.deleteSession({sessionId:'current'});await request('/logout',{});await clearSetup().catch(()=>{});}
 export async function login(email:string,password:string){if(!account)throw new Error('Choose a synthetic profile in the local pilot.');await account.createEmailPasswordSession({email,password});await request('/session',{});}
 export async function sendVerification(){if(!account)throw new Error('Appwrite is not connected.');await account.createVerification({url:`${location.origin}/auth/verify`});}
 export async function restoreAccount(){if(!account)return;await account.get();await request('/session',{});}
@@ -39,10 +40,10 @@ export async function beginMfa(){if(!account)throw new Error('MFA enrolment requ
 export async function confirmMfa(otp:string){if(!account)throw new Error('Appwrite is not connected.');await account.updateMfaAuthenticator({type:AuthenticatorType.Totp,otp});await account.updateMFA({mfa:true});}
 export async function challengeMfa(otp?:string,challengeId?:string){if(!account)throw new Error('Appwrite is not connected.');if(challengeId&&otp){await account.updateMfaChallenge({challengeId,otp});await request('/session',{});return '';}return (await account.createMfaChallenge({factor:AuthenticationFactor.Totp})).$id;}
 export async function downloadReport(){const data=await request('/export');const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='cbs-authorized-report.json';link.click();URL.revokeObjectURL(url);}
-export async function uploadEvidence(file:File,targetType:'CASE'|'PROJECT',targetId:string,clientRequestId:string){
+export async function uploadEvidence(file:File,targetType:'CASE'|'PROJECT',targetId:string,clientRequestId:string,expectedUploaderId?:string){
   if(file.size>4*1024*1024)throw new Error('Files must be no larger than 4 MiB.');
   const bytes=new Uint8Array(await file.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));
-  return request<import('../../shared/model').Evidence>('/evidence',{targetType,targetId,filename:file.name,mime:file.type,contentBase64:btoa(binary),clientRequestId});
+  return request<import('../../shared/model').Evidence>('/evidence',{targetType,targetId,filename:file.name,mime:file.type,contentBase64:btoa(binary),clientRequestId,expectedUploaderId});
 }
 export async function downloadEvidence(evidence:import('../../shared/model').Evidence){
   const {token}=await request<{token:string}>(`/evidence/${evidence.id}/download-token`,{});

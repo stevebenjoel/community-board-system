@@ -122,11 +122,15 @@ No. Current case narratives are not public. Your own records and authorized hand
 
 ### What if my connection drops during submission?
 
-Retry the same open submission. A stable request ID prevents duplicate creation if the first attempt already committed. Do not assume a report was received until the app confirms success.
+The guided form saves a copy on this device before sending. Open the reporting page with the same signed-in account after reconnecting. A stable request ID prevents duplicate cases. Use Retry sending if needed.
 
 ### Where is my saved browser draft?
 
-Reopen Report an issue in the same tab and synthetic/account profile. Drafts are tab-scoped, are not official records, and are removed after confirmed submission. Closing the tab or clearing session storage can remove them.
+The guided form shows queued reports under Saved on this device, including after closing and reopening a prepared offline page. You can delete a local copy there. Detailed-form drafts remain in the same tab and account.
+
+### Can I report without typing or internet?
+
+Yes, after preparing the reporting page and community while connected. Allow microphone access and choose Record a voice report. A recording can stand in for written details. Dictation continues through short pauses until you select Stop dictation or the browser reports an error. It may need internet.
 
 ### Can I attach photos or videos to a report?
 
